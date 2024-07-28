@@ -1,0 +1,94 @@
+# =============== #
+# Unity generated #
+# =============== #
+Temp/
+Logs/
+ServerData/
+obj.meta
+Obj/
+#bin.meta # UnityPurchasing contains the Bin folder, wtf?
+#Bin/ # UnityPurchasing contains the Bin folder, wtf?
+/UnityGenerated/
+/Library/*
+.gradle/
+/[Uu]ser[Ss]ettings/*
+
+# addressables
+!/Library/com.unity.addressables/
+!/Library/NetCode/
+ 
+# ============================================= #
+# Visual Studio / MonoDevelop generated / Rider #
+# ============================================= #
+ExportedObj/
+.idea/
+*.svd
+*.userprefs
+/*.csproj
+*.pidb
+*.suo
+*.sln
+*.user
+*.unityproj
+*.booproj
+.vscode/
+ 
+# ============ #
+# OS generated #
+# ============ #
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# dvscode
+/release-ios/
+/release-android/
+/builds/
+#Screenshot*
+
+# Builds
+/Build/
+/macos/
+/win64/
+/android
+/ios
+/windows
+
+# Visual studio
+.vs
+*.VC.opendb
+*.sdf
+*.csproj.meta
+
+Assets/Plugins/Editor/JetBrains/
+Assets/Plugins/Editor/JetBrains/*
+Assets/Plugins/Editor/JetBrains.meta
+Assets/Plugins/Editor/JetBrains/JetBrains.Rider.Unity.Editor.Plugin.Repacked.dll
+Assets/Plugins/Editor/JetBrains/JetBrains.Rider.Unity.Editor.Plugin.Repacked.dll.meta
+
+# DebugSettings
+DebugSettings.asset*
+/Assets/StreamingAssets/build_info.meta
+/Assets/StreamingAssets/build_info
+
+# DebuPlugins
+/Assets/StreamingAssets/APlus2/*
+
+# ==================== #
+     FMOD files
+# ==================== #
+!/[Aa]ssets/Plugins/FMOD/**/lib/*
+
+!/[Aa]ssets/Gizmos/FMOD/*
+!/[Aa]ssets/Editor Default Resources/FMOD/*
+
+/[Aa]ssets/Plugins/FMOD/Cache/*
+
+/[Aa]ssets/StreamingAssets/**/*.bank
+/[Aa]ssets/StreamingAssets/**/*.bank.meta
+
+fmod_editor.log
