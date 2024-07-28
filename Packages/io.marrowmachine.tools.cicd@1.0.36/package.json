@@ -1,0 +1,18 @@
+{
+  "category": "Unity",
+  "displayName": "CI Tools",
+  "name": "io.marrowmachine.tools.cicd",
+  "unity": "2021.3",
+  "version": "1.0.36",
+  "author": "MarrowMachine",
+  "keywords": [
+    "tools",
+    "unity",
+    "cicd"
+  ],
+  "dependencies": {
+    "com.unity.ext.nunit": "1.0.6",
+    "com.unity.nuget.newtonsoft-json": "3.0.2"
+  },
+  "description": "Tools and functions for CI/CD."
+}

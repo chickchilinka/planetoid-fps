@@ -1,0 +1,14 @@
+{
+  "name": "com.svermeulen.extenject",
+  "version": "9.3.1",
+  "displayName": "Extenject + UniRx",
+  "description": "Dependency Injection Framework for Unity3D",
+  "unity": "2019.3",
+  "keywords": [
+    "extenject"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "com.neuecc.unirx": "7.1.0"
+  }
+}

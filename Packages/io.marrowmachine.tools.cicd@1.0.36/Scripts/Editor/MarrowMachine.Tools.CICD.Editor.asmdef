@@ -1,0 +1,17 @@
+{
+    "name": "MarrowMachine.Tools.CICD.Editor",
+    "references": [
+        "MarrowMachine.Tools.CICD"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
