@@ -1,5 +1,6 @@
 ﻿using System;
 using AddressableAssetsSystem.Services;
+using Base.ApplicationMode;
 using General;
 using Localization.View;
 using UniRx;
@@ -48,7 +49,7 @@ namespace Scene.View
         public override void Show()
         {
             base.Show();
-            _signalBus.GetStream<GeneralGameSignals.ChangeLoadingText>()
+            _signalBus.GetStream<GeneralAppSignals.ChangeLoadingText>()
                 .Subscribe(OnChangeLoadingText)
                 .AddTo(_subscriptions);
             _service.DownloadStarted
@@ -81,7 +82,7 @@ namespace Scene.View
                 });
         }
 
-        private void OnChangeLoadingText(GeneralGameSignals.ChangeLoadingText signal)
+        private void OnChangeLoadingText(GeneralAppSignals.ChangeLoadingText signal)
         {
             if (string.IsNullOrEmpty(signal.Key))
                 return;

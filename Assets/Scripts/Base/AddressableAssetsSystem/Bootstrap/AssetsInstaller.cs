@@ -14,17 +14,25 @@
 // is strictly forbidden unless prior written permission is obtained
 // from MarrowMachine LLC.
 
+using AddressableAssetsSystem.Data;
+using AddressableAssetsSystem.Registry;
 using AddressableAssetsSystem.Rule;
 using AddressableAssetsSystem.Services;
 using AddressableAssetsSystem.Utils;
+using UnityEngine;
+using UnityEngine.Serialization;
 using Zenject;
 
 namespace AddressableAssetsSystem.Bootstrap
 {
-    public class AssetsInstaller : Installer
+    public class AssetsInstaller : MonoInstaller
     {
+        [SerializeField] private AssetPacksCatalogRegistry _assetPackSettingsRegistry;
+        [SerializeField] private AssetPacksCatalogRegistryReference _assetPackSettingsRegistryReference;
         public override void InstallBindings()
         {
+            Container.BindInstance(_assetPackSettingsRegistry);
+            Container.BindInstance(_assetPackSettingsRegistryReference);
             Container.InstallAsSingle<AddressableAssetsService>();
             Container.InstallAsSingle<AssetsService>();
             Container.InstallAsSingle<DownloadAssetsService>();

@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using AddressableAssetsSystem.Services;
+using Base.ApplicationMode;
 using General;
 using Zenject;
 
@@ -48,7 +49,7 @@ namespace ApplicationMode.States
             
             await AddressableAssetsService.CacheAssetsAsync(GetAssetNames().ToArray());
             
-            _signalBus.Fire(new GeneralGameSignals.ChangeLoadingText("connectingAssets"));
+            _signalBus.Fire(new GeneralAppSignals.ChangeLoadingText("connectingAssets"));
 
             OnApplied(true);
         }

@@ -1,5 +1,6 @@
 using ApplicationMode.States;
 using ApplicationMode.Types;
+using Base.ApplicationMode;
 using Pool;
 using Zenject;
 
@@ -18,6 +19,13 @@ namespace ApplicationMode
             Container.InstallAsSingle<StartSessionState>();
             Container.InstallAsSingle<DelayLoadingState>();
             Container.InstallAsSingle<AppModeFactory>();
+
+            Container.DeclareSignal<GeneralAppSignals.SessionStarted>();
+            Container.DeclareSignal<GeneralAppSignals.AppFocusChanged>();
+            Container.DeclareSignal<GeneralAppSignals.ApplicationQuit>();
+            Container.DeclareSignal<GeneralAppSignals.ChangeLoadingText>();
+            Container.DeclareSignal<GeneralAppSignals.PlayGameRequest>();
+            Container.DeclareSignal<GeneralAppSignals.RestartGameRequest>();
         }
         
         private void InstallAppMode()

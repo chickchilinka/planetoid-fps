@@ -1,4 +1,5 @@
 ﻿using ApplicationMode.States;
+using Base.ApplicationMode;
 using General;
 using Utils.Debugger;
 using Zenject;
@@ -56,7 +57,7 @@ namespace ApplicationMode.Types
             nextGameState.Applied += ApplyNextIndex;
             LogInfo($"[start] {nextGameState.GetType().Name}");
             nextGameState.Apply();
-            _signalBus.Fire(new GeneralGameSignals.ChangeLoadingText(nextGameState.LocalizationKey));
+            _signalBus.Fire(new GeneralAppSignals.ChangeLoadingText(nextGameState.LocalizationKey));
         }
         
         protected abstract IGameState[] GetStates();

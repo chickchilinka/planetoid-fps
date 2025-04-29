@@ -12,7 +12,7 @@ namespace ApplicationMode.Types
 
                 Factory.Resolve<DelayLoadingState>(),
 
-                Factory.Resolve<DownloadActualAddressablesState>(),
+                // Factory.Resolve<DownloadActualAddressablesState>(),
 
                 Factory.Resolve<DelayLoadingState>(),
 

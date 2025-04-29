@@ -1,6 +1,6 @@
-﻿namespace General
+﻿namespace Base.ApplicationMode
 {
-    public class GeneralGameSignals
+    public class GeneralAppSignals
     {
         public class ChangeLoadingText
         {

@@ -15,6 +15,7 @@
 // from MarrowMachine LLC.
 
 using AddressableAssetsSystem.Services;
+using Base.ApplicationMode;
 using General;
 using Rule;
 using Scene;
@@ -38,7 +39,7 @@ namespace AddressableAssetsSystem.Rule
         
         public override void Initialize()
         {
-            _signalBus.GetStream<GeneralGameSignals.PlayGameRequest>()
+            _signalBus.GetStream<GeneralAppSignals.PlayGameRequest>()
                 .DelayFrame(1)
                 .Subscribe(_=> PlayGameRequest())
                 .AddTo(_disposable);

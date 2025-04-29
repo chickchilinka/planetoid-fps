@@ -1,4 +1,5 @@
-﻿using General;
+﻿using Base.ApplicationMode;
+using General;
 using Zenject;
 
 namespace ApplicationMode.States
@@ -17,7 +18,7 @@ namespace ApplicationMode.States
         
         public override void Apply()
         {
-            _signalBus.Fire(new GeneralGameSignals.SessionStarted());
+            _signalBus.Fire(new GeneralAppSignals.SessionStarted());
 
             OnApplied(true);
         }

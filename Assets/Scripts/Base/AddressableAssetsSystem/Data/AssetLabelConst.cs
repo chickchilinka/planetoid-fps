@@ -20,11 +20,6 @@ namespace AddressableAssetsSystem.Data
     {
         //download labels
         public static string BaseAssetsPack = nameof(BaseAssetsPack);
-        public static string FirstLevelPack = nameof(FirstLevelPack);
-        public static string MetaGameBasePack = nameof(MetaGameBasePack);
-        public static string MetaGameLevel20Pack = nameof(MetaGameLevel20Pack);
-        public static string MetaGameLevel159Pack = nameof(MetaGameLevel159Pack);
-        public static string MetaGameLevel200Pack = nameof(MetaGameLevel200Pack);
 
         //local labels
         public static string LocalAssetPack = nameof(LocalAssetPack);
