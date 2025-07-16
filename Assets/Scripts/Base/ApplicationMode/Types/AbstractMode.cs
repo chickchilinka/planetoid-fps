@@ -1,4 +1,5 @@
-﻿using ApplicationMode.States;
+﻿using System;
+using ApplicationMode.States;
 using Base.ApplicationMode;
 using General;
 using Utils.Debugger;
@@ -8,6 +9,7 @@ namespace ApplicationMode.Types
 {
     public abstract class AbstractMode : IAppMode
     {
+        public event Action<string> OnStateChanged;
         protected AppModeFactory Factory { get; private set; }
 
         private IGameState[] _initializeSequence;
@@ -57,7 +59,7 @@ namespace ApplicationMode.Types
             nextGameState.Applied += ApplyNextIndex;
             LogInfo($"[start] {nextGameState.GetType().Name}");
             nextGameState.Apply();
-            _signalBus.Fire(new GeneralAppSignals.ChangeLoadingText(nextGameState.LocalizationKey));
+            OnStateChanged?.Invoke(nextGameState.LocalizationKey);
         }
         
         protected abstract IGameState[] GetStates();

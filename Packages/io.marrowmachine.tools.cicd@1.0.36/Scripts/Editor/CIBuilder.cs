@@ -103,7 +103,7 @@ namespace MarrowMachine.Tools
         {
             ApplyAndroidCommonSettings();
             EditorUserBuildSettings.buildAppBundle = false;
-            PlayerSettings.Android.useAPKExpansionFiles = false;
+            PlayerSettings.Android.splitApplicationBinary = false;
             SetupAndroidx64();
             GenericBuildAndroid($"android/application-full.{ApkExt}", BuildOptions.None);
         }

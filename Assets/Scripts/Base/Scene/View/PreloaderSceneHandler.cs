@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using Scene.Data;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -18,7 +17,7 @@ namespace General
         {
             yield return new WaitForSeconds(WaitSeconds);
 
-            SceneManager.LoadScene(SceneType.Initial.ToString());
+            SceneManager.LoadScene("Initial");
         }
     }
 }

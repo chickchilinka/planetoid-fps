@@ -18,12 +18,12 @@ namespace ViewSystem.ButtonCommand
         [SerializeField] private bool _hideAllPreviousWindows = true;
         [SerializeField] private bool _showOnAwake;
 
-        private IViewController _viewController;
+        private IViewService _viewService;
 
         [Inject]
-        public void Construct(IViewController viewController)
+        public void Construct(IViewService viewService)
         {
-            _viewController = viewController;
+            _viewService = viewService;
             
             if (_showOnAwake)
                 Activate();
@@ -47,19 +47,19 @@ namespace ViewSystem.ButtonCommand
 
             var type = Type.GetType(_viewType);
 
-            if (_viewController.IsViewShowing(type))
+            if (_viewService.IsViewShowing(type))
             {
                 if (_secondTapCloseWindow && _hideAllPreviousWindows)
-                    _viewController.HideAllByType(ViewType.Window);
+                    _viewService.HideAllByType(ViewType.Window);
                 else if (_secondTapCloseWindow)
-                    _viewController.HideView(type);
+                    _viewService.HideView(type);
             }
             else
             {
                 if (_hideAllPreviousWindows)
-                    _viewController.HideAllByType(ViewType.Window);
+                    _viewService.HideAllByType(ViewType.Window);
                 
-                _viewController.ShowView(type);
+                _viewService.ShowView(type);
             }
         }
     }

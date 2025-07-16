@@ -1,8 +1,8 @@
 using System;
+using Features.ViewComponents;
 using TMPro;
 using UniRx;
 using UnityEngine;
-using View;
 using ViewSystem;
 using ViewSystem.Attributes;
 using ViewSystem.Base;

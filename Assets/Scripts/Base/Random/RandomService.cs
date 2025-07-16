@@ -8,14 +8,14 @@ using Random = System.Random;
 
 namespace Utils.Services
 {
-    public static class RandomService
+    public class RandomService
     {
-        private static Random _random;
-        private static int _seed;
+        private Random _random;
+        private int _seed;
         
-        public static int Seed => _seed;
+        public int Seed => _seed;
 
-        public static void Initialize(int seed = Const.Values.DefaultSeed)
+        public void Initialize(int seed = Const.Values.DefaultSeed)
         {
             if (seed == Const.Values.DefaultSeed)
                 seed = (int) DateTime.Now.Ticks;
@@ -26,18 +26,12 @@ namespace Utils.Services
             PrintLog.Info(LogTag.Random, $"initialized with seed {_seed}");
         }
 
-        public static int GetRandomIntValue()
+        public int GetRandomIntValue()
         {
             return _random.Next();
         }
-
-        /// <summary>
-        /// Returnes random value in range [min;max)
-        /// </summary>
-        /// <param name="min">include</param>
-        /// <param name="max">exclude</param>
-        /// <returns>Random value in range</returns>
-        public static int GetRandomIntValue(int min, int max)
+        
+        public int GetRandomIntValue(int min, int max)
         {
             if (min == max)
                 Debug.LogWarning("[Random] min == max, returned min");
@@ -45,18 +39,18 @@ namespace Utils.Services
             return _random.Next(min, max);
         }
 
-        private static float GetRandomFloatValue()
+        private float GetRandomFloatValue()
         {
             return (float) _random.NextDouble();
         }
 
-        public static float GetRandomFloatValue01()
+        public float GetRandomFloatValue01()
         {
             var value = GetRandomFloatValue();
             return value - (int) value;
         }
 
-        public static int GetRandomIndexByInt(int[] weights)
+        public int GetRandomIndexByInt(int[] weights)
         {
             if (weights.Length == 1)
                 return 0;
@@ -83,7 +77,7 @@ namespace Utils.Services
             return GetRandomIntValue(0, weights.Length);
         }
         
-        public static int GetRandomIndexByFloat(float[] weights)
+        public int GetRandomIndexByFloat(float[] weights)
         {
             if (weights.Length == 1)
                 return 0;
@@ -110,7 +104,7 @@ namespace Utils.Services
             return GetRandomIntValue(0, weights.Length);
         }
 
-        public static int GetRandomIndex<T>(IEnumerable<T> source, List<T> exceptList = null)
+        public int GetRandomIndex<T>(IEnumerable<T> source, List<T> exceptList = null)
         {
             var sourceList = new List<T>(source);
             var copyWithoutExceptList = new List<T>(sourceList.Count);
@@ -133,7 +127,7 @@ namespace Utils.Services
             return sourceList.FindIndex(t => t.Equals(copyWithoutExceptList[randomIndex]));
         }
 
-        public static List<T> Shuffle<T>(List<T> source)
+        public List<T> Shuffle<T>(List<T> source)
         {
             var sourceCopy = new List<T>(source);
             var randomIndex = 0;

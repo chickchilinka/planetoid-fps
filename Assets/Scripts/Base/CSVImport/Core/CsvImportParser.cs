@@ -6,11 +6,12 @@ using System.Text.RegularExpressions;
 using ModestTree;
 using UnityEditor;
 using UnityEngine;
+using Utils.Debugger;
 
 namespace CsvImport
 {
-    #if UNITY_EDITOR
-    
+#if UNITY_EDITOR
+
     public class CsvImportParser
     {
         private static readonly char CsvSeparator = ',';
@@ -26,11 +27,12 @@ namespace CsvImport
         public CsvImportParser(IEnumerable<CsvImportParserSettings> customParsers = null)
         {
             _parsers = BaseParsers.ToDictionary(data => data.Key, data => data.Value);
-            if (customParsers != null) 
+            if (customParsers != null)
                 AddCustomParsers(_parsers, customParsers);
         }
 
-        private void AddCustomParsers(Dictionary<string, Action<SerializedProperty, string>> parsers, IEnumerable<CsvImportParserSettings> customParsers)
+        private void AddCustomParsers(Dictionary<string, Action<SerializedProperty, string>> parsers,
+            IEnumerable<CsvImportParserSettings> customParsers)
         {
             foreach (var parser in customParsers)
             {
@@ -74,7 +76,9 @@ namespace CsvImport
                     (property, value) =>
                     {
                         var enumIndex = Array.IndexOf(property.enumNames, value);
-                        if (enumIndex < 0) throw new InvalidOperationException(string.Format("Enum value '{0}' for type {1} not found", value, property.propertyType));
+                        if (enumIndex < 0)
+                            throw new InvalidOperationException(string.Format("Enum value '{0}' for type {1} not found",
+                                value, property.propertyType));
                         property.enumValueIndex = enumIndex;
                     }
                 }
@@ -112,15 +116,13 @@ namespace CsvImport
                 var isArray = propertyName.EndsWith("[]");
                 var result = true;
 
-                //                if (string.IsNullOrEmpty(propertyValue))
-                //                    Debug.LogWarning($"The value of {propertyName} property is <b>empty</b>!");
-
                 if (!isArray)
                     result = ParseChildSimpleProperty(property, propertyName, propertyValue);
                 else
                     result = ParseChildArrayProperty(property, propertyName, propertyValue);
 
-                //if (!result) return false;
+                if (!result)
+                    return false;
             }
 
             return true;
@@ -132,7 +134,8 @@ namespace CsvImport
             var innerProperty = property.FindPropertyRelative(propertyName);
             if (innerProperty == null)
             {
-                LogWarning(string.Format("[CsvImportUtils] property with name '<color=orange>{0}</color>' not found in '<color=orange>{1}</color>'",
+                LogWarning(string.Format(
+                    "[CsvImportUtils] property with name '<color=orange>{0}</color>' not found in '<color=orange>{1}</color>'",
                     propertyName, property.type));
                 return false;
             }
@@ -153,7 +156,7 @@ namespace CsvImport
                 LogWarning($"Child property is null for {propertyName}");
                 return false;
             }
-            
+
             if (childProperty.isArray)
                 childProperty.ClearArray();
 
@@ -189,21 +192,17 @@ namespace CsvImport
         public void LogWarning(string text)
         {
             WarningCount++;
-            Debug.LogWarning(text);
+            PrintLog.Warn(text);
         }
 
-        public void LogError(string text)
+        private void LogError(string text)
         {
             ErrorCount++;
-            Debug.LogError(text);
+            PrintLog.Error(text);
         }
 
         public bool SetPropertyValue(SerializedProperty property, string propertyValue)
         {
-            //Debug.Log(string.Format("Set property {0} of type {2} value = {1}", property, propertyValue, property.type));
-
-            //if (!string.IsNullOrEmpty(propertyValue)) return false; // !!! could be an empty field
-
             if (_parsers.ContainsKey(property.type))
             {
                 try
@@ -213,7 +212,8 @@ namespace CsvImport
                 catch (Exception e)
                 {
                     var value = string.IsNullOrEmpty(propertyValue) ? "EMPTY" : propertyValue;
-                    LogWarning($"[CsvImportUtils] can't parse <color=white><b>{ value }</b></color> property for {property.name} (<i>{ e.Message } </i>)");
+                    LogWarning(
+                        $"[CsvImportUtils] can't parse <color=white><b>{value}</b></color> property for {property.name} (<i>{e.Message} </i>)");
                     return false;
                 }
 
@@ -229,7 +229,6 @@ namespace CsvImport
 
         private static string[] ParseHeaders(string line)
         {
-            //Debug.Log("[CsvImportUtils] parsing header: " + line);
             var headers = Split(line);
             if (headers.Length == 0) return null;
             return headers;
@@ -259,7 +258,7 @@ namespace CsvImport
             return ImportFromData(serializedObject, csvContent);
         }
 
-        public bool ImportArrayFromData(SerializedObject serializedObject,
+        private bool ImportArrayFromData(SerializedObject serializedObject,
             IEnumerable<string> csvData)
         {
             if (csvData == null) return false;
@@ -282,7 +281,6 @@ namespace CsvImport
             while (lines.MoveNext())
             {
                 var line = lines.Current;
-                //Debug.Log("[CsvImportUtils] parsing line: " + line);
                 lineCounter++;
                 if (string.IsNullOrEmpty(line)) continue;
 
@@ -293,8 +291,6 @@ namespace CsvImport
 
                 arrayIndex++;
             }
-
-            //Debug.Log(string.Format("[CsvImportUtil] Imported {1} of {0} lines", lineCounter, arrayIndex));
 
             lines.Dispose();
             return true;
@@ -324,7 +320,6 @@ namespace CsvImport
             while (lines.MoveNext())
             {
                 var line = lines.Current;
-                //Debug.Log("[CsvImportUtils] parsing line: " + line);
                 lineCounter++;
                 if (string.IsNullOrEmpty(line)) continue;
 
@@ -343,7 +338,6 @@ namespace CsvImport
             var propertyData = BuildPropertyData(headerNames.ToArray(), headerValues.ToArray());
 
             ParseProperty(serializedProperty, propertyData);
-            //Debug.Log(string.Format("[CsvImportUtil] Imported {1} of {0} lines", lineCounter, arrayIndex));
 
             lines.Dispose();
             return true;
@@ -352,10 +346,10 @@ namespace CsvImport
         private Dictionary<string, string> BuildPropertyData(string[] headerNames, string[] values)
         {
             var data = new Dictionary<string, string>();
-            
+
             for (var i = 0; i < values.Length; i++)
             {
-                if (i >= headerNames.Length) 
+                if (i >= headerNames.Length)
                     break;
 
                 var name = headerNames[i].Trim();
@@ -366,8 +360,6 @@ namespace CsvImport
                     LogError($"[CsvImportUtil] invalid header name for value {value}, empty not allowed");
                     continue;
                 }
-
-                //if (string.IsNullOrEmpty(value)) continue; // !!! could be an empty field
 
                 // array value
                 if (name.EndsWith("[]"))
@@ -387,16 +379,14 @@ namespace CsvImport
 #if UNITY_EDITOR_OSX
             var envDelimiter = "\r".ToCharArray();
 #else
-                var envDelimiter = Environment.NewLine.ToCharArray();
+            var envDelimiter = Environment.NewLine.ToCharArray();
 #endif
-            
+
             var valu = value.TrimEnd(envDelimiter);
             var result = RexCsvSplitter.Split(valu);
 
             for (int i = 0; i < result.Length; i++)
                 result[i] = Unescape(result[i]);
-
-            //Debug.Log("Result : " + result.Aggregate((a, b) => a + " | " + b));
 
             return result;
         }
@@ -416,7 +406,7 @@ namespace CsvImport
             return s;
         }
 
-        public static string Unescape(string s)
+        private static string Unescape(string s)
         {
             try
             {
@@ -430,13 +420,12 @@ namespace CsvImport
             }
             catch (Exception)
             {
-                Debug.LogError($"There are some enter in the sheet row");
+                PrintLog.Error("There are some enter in the sheet row");
             }
 
             return s;
         }
-
     }
-    
-    #endif
+
+#endif
 }

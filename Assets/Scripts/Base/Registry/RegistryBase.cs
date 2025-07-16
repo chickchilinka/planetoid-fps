@@ -2,7 +2,7 @@
 
 namespace Registry
 {
-    public abstract class RegistryBase<TData> : ScriptableObject, IRegistryClass
+    public abstract class RegistryBase<TData> : ScriptableObject, IRegistry
         where TData : class
     {
         [SerializeField] protected TData RegistryData;

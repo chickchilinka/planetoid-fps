@@ -1,4 +1,5 @@
 ﻿using Base.ApplicationMode;
+using Cysharp.Threading.Tasks;
 using General;
 using Zenject;
 
@@ -16,11 +17,12 @@ namespace ApplicationMode.States
             _signalBus = signalBus;
         }
         
-        public override void Apply()
+        public override UniTaskVoid Apply()
         {
             _signalBus.Fire(new GeneralAppSignals.SessionStarted());
 
             OnApplied(true);
+            return new UniTaskVoid();
         }
     }
 }

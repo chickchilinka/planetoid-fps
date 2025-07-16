@@ -1,5 +1,8 @@
 using AddressableAssetsSystem.Bootstrap;
 using ApplicationMode;
+using Base.EffectSystem.Bootstrap;
+using Base.Pool.Bootstrap;
+using Base.Pool.Utils;
 using General;
 using Pool;
 using Scene;
@@ -17,6 +20,7 @@ namespace Bootstrap
             Container.Install<PoolInstaller>();
             Container.Install<SceneInstaller>();
             Container.Install<AppModeInstaller>();
+            Container.Install<EffectsInstaller>();
             Container.InstallAsSingle<GameController>();
         }
     }

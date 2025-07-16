@@ -1,4 +1,5 @@
-﻿using EffectSystem.Data;
+﻿using Base.EffectSystem.Data;
+using EffectSystem.Storage;
 using UnityEngine;
 using Zenject;
 
@@ -6,20 +7,19 @@ namespace EffectSystem.View
 {
     public class EffectsHolder : MonoBehaviour
     {
-#pragma warning disable 0649
         [SerializeField] private EffectLayer _effectLayer;
-        private SignalBus _signalBus;
+        private EffectsHolderStorage _storage;
 
         [Inject]
-        public void Construct(SignalBus signalBus)
+        public void Construct(EffectsHolderStorage storage)
         {
-            _signalBus = signalBus;
-            _signalBus.Fire(new EffectsSignals.AddHolder(transform, _effectLayer));
+            _storage = storage;
+            _storage.AddEffectsHolder(_effectLayer, this);
         }
 
         private void OnDestroy()
         {
-            _signalBus?.Fire(new EffectsSignals.RemoveHolder(_effectLayer));
+            _storage.RemoveEffectsHolder(_effectLayer);
         }
     }
 }

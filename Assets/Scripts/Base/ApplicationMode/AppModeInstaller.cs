@@ -1,6 +1,7 @@
 using ApplicationMode.States;
 using ApplicationMode.Types;
 using Base.ApplicationMode;
+using Base.Pool.Utils;
 using Pool;
 using Zenject;
 
@@ -14,10 +15,10 @@ namespace ApplicationMode
             
             Container.InstallAsSingle<DownloadActualAddressablesState>();
             Container.InstallAsSingle<DownloadAllAddressablesState>();
-            Container.InstallAsSingle<LoadMapScene>();
+            Container.InstallAsSingle<LoadMapSceneState>();
             Container.InstallAsSingle<ShowInitialWindowState>();
+            Container.InstallAsSingle<LoadTestSceneState>();
             Container.InstallAsSingle<StartSessionState>();
-            Container.InstallAsSingle<DelayLoadingState>();
             Container.InstallAsSingle<AppModeFactory>();
 
             Container.DeclareSignal<GeneralAppSignals.SessionStarted>();

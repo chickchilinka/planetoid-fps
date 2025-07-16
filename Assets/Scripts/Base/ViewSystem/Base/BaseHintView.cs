@@ -19,13 +19,13 @@ namespace ViewSystem.Base
 
         protected virtual bool IsHideOnTap { get; set; } = true;
 
-        private IViewController _viewController;
+        private IViewService _viewService;
         private IDisposable _tapStream;
 
         [Inject]
-        public void Constrtuct(IViewController viewController)
+        public void Constrtuct(IViewService viewService)
         {
-            _viewController = viewController;
+            _viewService = viewService;
         }
         
         protected override void InitializeAnimation()
@@ -43,7 +43,7 @@ namespace ViewSystem.Base
                 .Subscribe(_ =>
                 {
                     _tapStream?.Dispose();
-                    _viewController.HideView(GetType());
+                    _viewService.HideView(GetType());
                 });
             
             base.Show();

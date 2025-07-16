@@ -1,15 +1,15 @@
 ﻿using System;
-using Localization.Data;
+using Base.Localization.Data;
 using Registry;
 using UnityEngine;
 
-namespace Localization.Registry
+namespace Base.Localization.Registry
 {
     [Serializable]
     [CreateAssetMenu(fileName = "LocalizationSettingsRegistry", menuName = "Registry/Remote/Localization/LanguageSettings")]
-    public class LanguageSettingsRegistry : RegistryListBase<LanguageSettings>
+    public class LanguageSettingsRegistry : RegistryListBase<TranslationData>
     {
-        public void UpdateRegistry(LanguageSettings[] localizationSettingses)
+        public void UpdateRegistry(TranslationData[] localizationSettingses)
         {
             SetItems(localizationSettingses);
         }

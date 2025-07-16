@@ -1,4 +1,5 @@
 ﻿using System;
+using Cysharp.Threading.Tasks;
 
 namespace ApplicationMode.States
 {
@@ -8,7 +9,7 @@ namespace ApplicationMode.States
 
         public abstract string LocalizationKey { get; }
         public abstract bool StopSequenceOnFail { get; }
-        public abstract void Apply();
+        public abstract UniTaskVoid Apply();
 
 
         public virtual void Clear()

@@ -1,26 +1,40 @@
-﻿using Rule;
+﻿using System;
+using Rule;
 using Scene.Data;
 using Scene.View;
+using UniRx;
 using ViewSystem.Controller;
 
 namespace Scene.Rules
 {
-    public class ShowLoaderRule : AbstractSignalRule<SceneSignals.LoadingStarted>
+    public class ShowLoaderRule : AbstractRule
     {
-        private readonly IViewController _viewController;
+        private readonly IViewService _viewService;
+        private readonly ISceneLoader _sceneLoader;
 
-        private const SceneType SceneWithSimpleTransition = SceneType.Initial;
+        private IDisposable _subscription;
 
-        public ShowLoaderRule(IViewController viewController)
+        public ShowLoaderRule(IViewService viewService, ISceneLoader sceneLoader)
         {
-            _viewController = viewController;
+            _viewService = viewService;
+            _sceneLoader = sceneLoader;
         }
 
-        protected override void OnSignalFired(SceneSignals.LoadingStarted signal)
+        public override void Initialize()
         {
-            var isAnimatedTransition = signal.ActiveScene != SceneWithSimpleTransition;
+            _subscription = _sceneLoader.Status.Where(status => status == SceneLoaderStatus.Loading)
+                .Subscribe(_ => ShowTransition());
+        }
 
-            _viewController.ShowView<TransitionWindow, TransitionWindow.Data>(new TransitionWindow.Data() { IsAnimatedTransition = isAnimatedTransition });
+        public override void Dispose()
+        {
+            _subscription?.Dispose();
+        }
+
+        private void ShowTransition()
+        {
+            _viewService.ShowView<TransitionWindow, TransitionWindow.Data>(new TransitionWindow.Data()
+                { });
         }
     }
 }

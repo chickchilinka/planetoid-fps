@@ -10,9 +10,11 @@ using Addressables.View;
 using AddressableAssetsSystem.Services;
 using UnityEngine.UI;
 using DG.Tweening;
+using Scene.Data;
 using Spine;
 using Spine.Unity;
 using TMPro;
+using UniRx;
 
 namespace Scene.View
 {
@@ -21,37 +23,36 @@ namespace Scene.View
     {
 #pragma warning disable 0649
         [SerializeField] private Image _simpleLoader;
-        [SerializeField] private SkeletonGraphic _skeletonTransition;
         [SerializeField] private TextMeshProUGUI _loadingText;
 
         public class Data : IViewInput
         {
-            public bool IsAnimatedTransition;
         }
 
         public override ViewLayer ViewLayer => ViewLayer.Global;
 
         private const float SimpleEndTransitionDuration = 1f;
 
-        private IViewController _viewController;
-        private SignalBus _signalBus;
+        private IViewService _viewService;
+        private ISceneLoader _sceneLoader;
         private AddressableAssetsService _service;
 
         private string _animationName;
         private Skin[] _skins;
         private TrackEntry _track;
-        private IDisposable _animationStream;
+        private IDisposable _animationSubscription;
+        private IDisposable _loadingSubscription;
         private float _effectDuration;
 
         private bool _isLoadingCompleted;
         private DownloadProgressPopUp _downloadProgressPopUp;
 
         [Inject]
-        public void Construct(IViewController viewController, SignalBus signalBus, 
+        public void Construct(IViewService viewService, ISceneLoader sceneLoader,
             AddressableAssetsService service)
         {
-            _viewController = viewController;
-            _signalBus = signalBus;
+            _viewService = viewService;
+            _sceneLoader = sceneLoader;
             _service = service;
         }
 
@@ -59,47 +60,28 @@ namespace Scene.View
         {
             base.Show(data);
 
-            _signalBus.TryUnsubscribe<SceneSignals.LoadingCompleted>(LoadingCompleted);
-            _signalBus.Subscribe<SceneSignals.LoadingCompleted>(LoadingCompleted);
+            _loadingSubscription = _sceneLoader.Status.Where(status => status == SceneLoaderStatus.Loaded)
+                .Subscribe(_ => LoadingCompleted());
 
-            ShowTransition(data.IsAnimatedTransition);
+            ShowTransition();
         }
 
-        private async void ShowTransition(bool isAnimatedTransition)
+        private async void ShowTransition()
         {
             _isLoadingCompleted = false;
 
-            _simpleLoader.gameObject.SetActive(!isAnimatedTransition);
-            _skeletonTransition.gameObject.SetActive(isAnimatedTransition);
-
-            if (isAnimatedTransition)
-            {
-                _loadingText.gameObject.SetActive(false);
-
-                _skins = _skeletonTransition.SkeletonData.Skins.Items;
-                _animationName = _skeletonTransition.SkeletonData.Animations.Items[0].Name;
-                _effectDuration = _skeletonTransition.SkeletonData.Animations.Items[0].Duration;
-
-                var index = UnityEngine.Random.Range(1, _skins.Length);
-                _skeletonTransition.Skeleton.SetSkin(_skins[index]);
-
-                _track = _skeletonTransition.AnimationState.SetAnimation(0, _animationName, false);
-
-                _track.TimeScale = 0;
-            }
-            else
-                _simpleLoader.color = Color.white;
+            _simpleLoader.color = Color.white;
 
             _loadingText.gameObject.SetActive(true);
 
             if (_service.IsDownloadingAnyAsset)
             {
-                _viewController.ShowView<DownloadProgressPopUp, DownloadProgressPopUp.Data>(
+                _viewService.ShowView<DownloadProgressPopUp, DownloadProgressPopUp.Data>(
                     new DownloadProgressPopUp.Data(_service.DownloadProgress));
 
-                _downloadProgressPopUp = _viewController.GetActiveView<DownloadProgressPopUp>();
+                _downloadProgressPopUp = _viewService.GetActiveView<DownloadProgressPopUp>();
             }
-            
+
             while (!_isLoadingCompleted)
             {
                 await Task.Yield();
@@ -107,28 +89,20 @@ namespace Scene.View
 
             if (_downloadProgressPopUp != null)
             {
-                _viewController.HideView(_downloadProgressPopUp);
+                _viewService.HideView(_downloadProgressPopUp);
                 _downloadProgressPopUp = null;
             }
 
             _loadingText.gameObject.SetActive(false);
 
-            if (isAnimatedTransition)
-            {
-                _track.TimeScale = 1f;
+            _simpleLoader.DOColor(Color.clear, SimpleEndTransitionDuration).SetEase(Ease.InOutSine);
 
-                await Task.Delay(TimeSpan.FromSeconds(_effectDuration));
-            }
-            else
-            {
-                _simpleLoader.DOColor(Color.clear, SimpleEndTransitionDuration).SetEase(Ease.InOutSine);
+            await Task.Delay(TimeSpan.FromSeconds(SimpleEndTransitionDuration));
 
-                await Task.Delay(TimeSpan.FromSeconds(SimpleEndTransitionDuration));
-            }
 
-            _signalBus.Unsubscribe<SceneSignals.LoadingCompleted>(LoadingCompleted);
+            _loadingSubscription?.Dispose();
 
-            _viewController.HideView<TransitionWindow>();
+            _viewService.HideView<TransitionWindow>();
         }
 
         private void LoadingCompleted()

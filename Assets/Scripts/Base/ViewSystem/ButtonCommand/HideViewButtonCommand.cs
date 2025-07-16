@@ -7,22 +7,22 @@ namespace ViewSystem.ButtonCommand
 {
     public class HideViewButtonCommand : AbstractButton
     {
-        private IViewController _viewController;
+        private IViewService _viewService;
 
         private IView _parentView;
         private IView ParentView => _parentView ?? (_parentView = GetComponentInParent<IView>());
 
         [Inject]
-        public void Construct(IViewController viewController)
+        public void Construct(IViewService viewService)
         {
-            _viewController = viewController;
+            _viewService = viewService;
         }
 
         public override void Activate()
         {
             if (ParentView != null)
             {
-                _viewController.HideView(ParentView);
+                _viewService.HideView(ParentView);
             }
         }
 

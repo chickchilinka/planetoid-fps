@@ -11,11 +11,11 @@ namespace ViewSystem.Base
         private FadeTransitionData _data;
         [SerializeField] private float _delay;
         private IDisposable _disposable;
-        private IViewController _viewController;
+        private IViewService _viewService;
         [Inject]
-        public void Construct(IViewController viewController)
+        public void Construct(IViewService viewService)
         {
-            _viewController = viewController;
+            _viewService = viewService;
         }
         
         public class FadeTransitionData: IViewInput
@@ -38,7 +38,7 @@ namespace ViewSystem.Base
             {
                 Transit();
                 _disposable.Dispose();
-                _viewController.HideView(this);
+                _viewService.HideView(this);
             });
         }
         private void Transit()

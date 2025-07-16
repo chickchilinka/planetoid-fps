@@ -7,6 +7,7 @@ using UniRx;
 using UnityEditor;
 using UnityEngine;
 using Utils;
+using Utils.Debugger;
 using Utils.Extensions;
 
 namespace CSVImport.Editor
@@ -66,7 +67,7 @@ namespace CSVImport.Editor
                         importedSettings.Value++;
                     }, ex =>
                     {
-                        parser.LogWarning($"[ImportUtils] URL: '{settings.Url}\n Exception: '{ex.ToString()}'");
+                        PrintLog.Warn($"[ImportUtils] URL: '{settings.Url}\n Exception: '{ex.ToString()}'");
                         importedSettings.Value++;
                     });
 
@@ -77,7 +78,7 @@ namespace CSVImport.Editor
         private static bool ParseRegistry(CsvImportParser parser, ScriptableObject registryObject, string csvObject)
         {
             var isRegistryList = registryObject is IRegistryList;
-            var isRegistry = registryObject is IRegistryClass;
+            var isRegistry = registryObject is IRegistry;
             var parseResult = false;
 
             if (!isRegistryList && !isRegistry)

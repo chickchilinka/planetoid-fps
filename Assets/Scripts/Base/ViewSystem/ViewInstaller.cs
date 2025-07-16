@@ -28,7 +28,7 @@ namespace ViewSystem
 
         private void InstallController()
         {
-            Container.Bind<IViewController>().To<ViewController>().AsSingle();
+            Container.Bind<IViewService>().To<ViewService>().AsSingle();
         }
 
         private void InstallSignals()

@@ -1,9 +1,8 @@
 ﻿using DG.Tweening;
 using Pool;
 using UnityEngine;
-using Utils.Extensions;
 
-namespace EffectSystem.Base
+namespace Base.EffectSystem.Base
 {
     public abstract class BaseEffect : BasePoolable, IEffect
     {
@@ -28,7 +27,8 @@ namespace EffectSystem.Base
 
         public override void OnDespawn(Transform parent)
         {
-            _sequence?.Stop();
+            _sequence?.Pause();
+            _sequence?.Kill();
             _sequence = null;
 
             base.OnDespawn(parent);

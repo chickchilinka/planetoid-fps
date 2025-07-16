@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using AddressableAssetsSystem.Services;
 using Base.ApplicationMode;
+using Cysharp.Threading.Tasks;
 using General;
 using Zenject;
 
@@ -24,7 +25,7 @@ namespace ApplicationMode.States
             _signalBus = signalBus;
         }
 
-        public override async void Apply()
+        public override async UniTaskVoid Apply()
         {
             await AddressableAssetsService.Initialize();
             await AddressableAssetsService.UpdateCatalog();

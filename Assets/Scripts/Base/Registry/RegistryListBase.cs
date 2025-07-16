@@ -9,7 +9,7 @@ namespace Registry
 {
     public abstract class RegistryListBase<TData> : ScriptableObject, IRegistryList where TData : class, IRegistryData
     {
-        [SerializeField] protected TData[] _registryItems;  // don't change the name
+        [SerializeField] protected TData[] _registryItems;
         
         public int Length => _registryItems.Length;
         public Type DataType { get; } = typeof(TData);

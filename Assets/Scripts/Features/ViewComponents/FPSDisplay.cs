@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Utils.View
+namespace Features.ViewComponents
 {
     public class FPSDisplay : MonoBehaviour
     {
@@ -14,17 +14,17 @@ namespace Utils.View
         {
             int w = Screen.width, h = Screen.height;
  
-            GUIStyle style = new GUIStyle();
+            var style = new GUIStyle();
  
-            float msec = _deltaTime * 1000.0f;
-            float fps = 1.0f / _deltaTime;
+            var msec = _deltaTime * 1000.0f;
+            var fps = 1.0f / _deltaTime;
             
-            Rect rect = new Rect(0, 140, w, h * 2 / 100);
+            var rect = new Rect(0, 140, w, h * 2 / 100);
             style.alignment = TextAnchor.UpperLeft;
             style.fontSize = h * 2 / 100;
             style.normal.textColor = GetColor(fps);
             
-            string text = string.Format("{0:0.0} ms ({1:0.} fps)", msec, fps);
+            var text = string.Format("{0:0.0} ms ({1:0.} fps)", msec, fps);
             GUI.Label(rect, text, style);
         }
 

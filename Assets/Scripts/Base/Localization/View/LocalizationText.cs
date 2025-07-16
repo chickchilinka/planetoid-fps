@@ -1,4 +1,5 @@
 ﻿using System;
+using Base.Localization.Services;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -13,7 +14,6 @@ namespace Localization.View
         [SerializeField] private string _id;
 
         private LocalizationService _localizationService;
-        private SignalBus _signalBus;
 
         private Text _textComponent;
         private TextMeshProUGUI _textMeshComponent;
@@ -36,12 +36,11 @@ namespace Localization.View
         private void Construct(SignalBus signalBus, LocalizationService localizationService)
         {
             _localizationService = localizationService;
-            _signalBus = signalBus;
 
             _textComponent = GetComponent<Text>();
             _textMeshComponent = GetComponent<TextMeshProUGUI>();
 
-            _signalBus.Subscribe<LocalizationSignals.LanguageChanged>(Refresh);
+            _localizationService.OnLanguageChanged += Refresh;
 
             Refresh();
         }
@@ -94,7 +93,7 @@ namespace Localization.View
 
         private void OnDestroy()
         {
-            _signalBus?.TryUnsubscribe<LocalizationSignals.LanguageChanged>(Refresh);
+            _localizationService.OnLanguageChanged -= Refresh;
         }
     }
 }

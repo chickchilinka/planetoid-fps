@@ -2,7 +2,7 @@
 using ViewSystem.Attributes;
 using ViewSystem.Base;
 
-namespace General.View
+namespace Base.ApplicationMode.View
 {
     [AttributeViewType(ViewType.Window)]
     public class InitialWindow : BaseView

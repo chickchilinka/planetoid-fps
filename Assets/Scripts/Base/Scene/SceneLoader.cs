@@ -23,8 +23,10 @@ namespace Scene
         private readonly List<string> _loadingScenes = new();
         private readonly SemaphoreSlim _loadingScenesSemaphore = new(1, 1);
         private static readonly TimeSpan TimeoutDuration = TimeSpan.FromSeconds(15f);
-
-        public SceneType ActiveScene { get; private set; }
+        private readonly ReactiveProperty<SceneLoaderStatus> _status = new(SceneLoaderStatus.None);
+        
+        public IReadOnlyReactiveProperty<SceneLoaderStatus> Status => _status;
+        public string ActiveScene { get; private set; }
 
         public SceneLoader(SignalBus signalBus, 
             AddressableAssetsService addressableAssetsService)
@@ -32,13 +34,12 @@ namespace Scene
             _signalBus = signalBus;
             _addressableAssetsService = addressableAssetsService;
 
-            ActiveScene = SceneManager.GetActiveScene().name.ToEnum<SceneType>();
+            ActiveScene = SceneManager.GetActiveScene().name;
         }
 
 
-        public async void LoadScene(SceneType sceneType)
+        public async UniTask LoadSceneAsync(string scene)
         {
-            var scene = sceneType.ToString();
 
             await _loadingScenesSemaphore.WaitAsync();
             if (_loadingScenes.Contains(scene))
@@ -52,17 +53,15 @@ namespace Scene
                 .Timer(TimeoutDuration)
                 .Subscribe(_=> PrintLog.Error(LogTag.Scene, $"Scene {scene} is loading more than 15 seconds!"));
 
-            if (ActiveScene == sceneType)
+            if (ActiveScene == scene)
             {
-                PrintLog.Info(LogTag.Scene, $"Start unload {scene} scene for reload");
-                _signalBus.Fire(new SceneSignals.UnloadingStarted(scene));
+                PrintLog.Error(LogTag.Scene, $"Trying loading already loaded scene {scene}");
             }
             
             _loadingScenes.Add(scene);
             _loadingScenesSemaphore.Release();
 
-            _signalBus.Fire(new SceneSignals.LoadingRequested(sceneType));
-            _signalBus.Fire(new SceneSignals.LoadingStarted(ActiveScene));
+            SetStatus(SceneLoaderStatus.Loading);
 
             if (!_addressableAssetsService.IsAllNecessaryAssetsLoaded)
             {
@@ -71,9 +70,9 @@ namespace Scene
                 await UniTask.Yield();
                 PrintLog.Info(LogTag.Scene, "End wait for necessary assets");
             }
-            await AsyncSceneLoad(sceneType.ToString(), LoadSceneMode.Single);
+            await AsyncSceneLoad(scene, LoadSceneMode.Single);
 
-            ActiveScene = sceneType;
+            ActiveScene = scene;
 
             await _loadingScenesSemaphore.WaitAsync();
             
@@ -84,31 +83,13 @@ namespace Scene
                 await UniTask.WaitWhile(() => _loadingScenes.Count > 0);
                 PrintLog.Info(LogTag.Scene, "End wait for loading Scenes");
             }
+            
             _loadingScenesSemaphore.Release();
 
             Resources.UnloadUnusedAssets();
             GC.Collect();
 
-            CompleteLoading(sceneType);
-        }
-
-        public async void LoadAdditionalScene(string scene, bool sceneIsActive = false)
-        {
-            if (_loadingScenes.Contains(scene) || string.IsNullOrEmpty(scene))
-                return;
-
-            _loadingScenes.Add(scene);
-
-            _signalBus.Fire(new SceneSignals.AdditionalSceneLoadingStarted(scene));
-
-            await AsyncSceneLoad(scene, LoadSceneMode.Additive);
-
-            _signalBus.Fire(new SceneSignals.AdditionalSceneLoadingCompleted(scene));
-
-            if (sceneIsActive)
-                SceneManager.SetActiveScene(SceneManager.GetSceneByName(scene));
-
-            _loadingScenes.Remove(scene);
+            CompleteLoading(scene);
         }
 
         private async UniTask AsyncSceneLoad(string scene, LoadSceneMode loadSceneMode, float delay = 0f)
@@ -117,41 +98,21 @@ namespace Scene
             await SceneManager.LoadSceneAsync(string.Format(ScenePathFormat, scene), loadSceneMode).ToUniTask();
         }
 
-        public async void UnloadAdditionalScene(string scene)
+        private void CompleteLoading(string scene)
         {
-            if (_loadingScenes.Contains(scene))
-                return;
-
-            var scenePath = string.Format(ScenePathFormat, scene);
-            if (SceneManager.GetSceneByName(scenePath).IsValid())
-            {
-                _signalBus.Fire(new SceneSignals.UnloadingStarted(scene));
-
-                _loadingScenes.Add(scene);
-
-                await SceneManager.UnloadSceneAsync(scenePath).ToUniTask();
-
-                Resources.UnloadUnusedAssets();
-                GC.Collect();
-            }
-
-            _loadingScenes.Remove(scene);
-        }
-
-        public bool IsSceneLoaded(string scene)
-        {
-            return SceneManager.GetSceneByName(scene).isLoaded;
-        }
-
-        private void CompleteLoading(SceneType sceneType)
-        {
-            PrintLog.Info(LogTag.Scene, $"Scene loaded {sceneType}");
-            _signalBus.Fire(new SceneSignals.LoadingCompleted(sceneType));
+            PrintLog.Info(LogTag.Scene, $"Scene loaded: {scene}");
+            
+            SetStatus(SceneLoaderStatus.Loaded);
         }
 
         public void Dispose()
         {
             _loadingScenesSemaphore?.Dispose();
+        }
+
+        private void SetStatus(SceneLoaderStatus status)
+        {
+            _status.Value = status;
         }
     }
 }

@@ -8,23 +8,9 @@ using Utils.Debugger;
 
 public class GameMenu
 {
-    // private static readonly Vector2Int GameResolution = new Vector2Int(1440, 2880);
-    // private static readonly Vector2Int EditorResolution = new Vector2Int(2224, 1880);
-
     private const string EditorPath = "Game/";
     private const string MainGamePath = "Game/";
     private const string MenuPath = "Game/";
-    [MenuItem(EditorPath + "Build/OSX")]
-    public static void BuildEditorOsX()
-    {
-        BuildEditor(BuildTarget.StandaloneOSX, "app");
-    }
-    
-    [MenuItem(EditorPath + "Build/Windows")]
-    public static void BuildEditorWindows()
-    {
-        BuildEditor(BuildTarget.StandaloneWindows, "exe");
-    }
 
     [MenuItem(MenuPath + "Clear/All")]
     public static void ClearAll()
@@ -32,8 +18,6 @@ public class GameMenu
         Caching.ClearCache();
         PlayerPrefs.DeleteKey(Const.Keys.PrefsPlayerDataKey);
         PlayerPrefs.DeleteKey(Const.Keys.PrefsGameDataKey);
-        // PlayerPrefs.DeleteKey(Const.Keys.PrefsGameDataInfoKey);
-        PlayerPrefs.DeleteKey(Const.Keys.FieldActionsRecorderJson);
         PlayerPrefs.Save();
     }
     
@@ -51,7 +35,6 @@ public class GameMenu
     {
         Caching.ClearCache();
         PlayerPrefs.DeleteKey(Const.Keys.PrefsGameDataKey);
-        // PlayerPrefs.DeleteKey(Const.Keys.PrefsGameDataInfoKey);
         PlayerPrefs.Save();
     }
         
@@ -66,24 +49,7 @@ public class GameMenu
         if (EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
             EditorSceneManager.SaveOpenScenes();
             
-        EditorSceneManager.OpenScene(string.Format(SceneLoader.ScenePathFormat, SceneType.Preloader), OpenSceneMode.Single);
+        EditorSceneManager.OpenScene(string.Format(SceneLoader.ScenePathFormat, "Preloader"), OpenSceneMode.Single);
         EditorApplication.isPlaying = true;
-    }
-    
-    private static void BuildEditor(BuildTarget buildTarget, string extension)
-    {
-        var path = EditorUtility.SaveFolderPanel("Choose Location of Built Game", "", "");
-        
-        if (string.IsNullOrEmpty(path))
-            return;
-        
-        var levels = new []
-        {
-            $"Assets/Scenes/{SceneType.Preloader}.unity", 
-            $"Assets/Scenes/{SceneType.Initial}.unity",
-            $"Assets/Scenes/{SceneType.Game}.unity",
-            $"Assets/Scenes/{SceneType.LevelEditor}.unity",
-        };
-        BuildPipeline.BuildPlayer(levels, path + $"/DL_editor.{extension}", buildTarget, BuildOptions.None);
     }
 }

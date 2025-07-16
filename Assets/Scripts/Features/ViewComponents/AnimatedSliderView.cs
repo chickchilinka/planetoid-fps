@@ -1,13 +1,12 @@
-﻿using UnityEngine;
-using DG.Tweening;
+﻿using DG.Tweening;
+using UnityEngine;
 using UnityEngine.UI;
 
-namespace View
+namespace Features.ViewComponents
 {
     [RequireComponent(typeof(Slider))]
     public class AnimatedSliderView : MonoBehaviour
     {
-#pragma warning disable 0649
         [SerializeField] private float _animationDuration;
         [SerializeField] private Slider _animatedSlider;
 

@@ -1,4 +1,4 @@
-﻿namespace EffectSystem.Data
+﻿namespace Base.EffectSystem.Data
 {
     public enum EffectLayer
     {

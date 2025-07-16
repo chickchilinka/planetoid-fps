@@ -1,4 +1,4 @@
-﻿namespace EffectSystem.Base
+﻿namespace Base.EffectSystem.Base
 {
     public abstract class BaseEffectWithInputData<TEffectData> : BaseEffect, IEffectWithInputData<TEffectData> 
         where TEffectData : IEffectData

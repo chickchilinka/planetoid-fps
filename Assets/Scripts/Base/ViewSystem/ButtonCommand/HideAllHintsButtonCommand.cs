@@ -6,17 +6,17 @@ namespace ViewSystem.ButtonCommand
 {
     public class HideAllHintsButtonCommand : AbstractButton
     {
-        private IViewController _viewController;
+        private IViewService _viewService;
         
         [Inject]
-        public void Construct(IViewController viewController)
+        public void Construct(IViewService viewService)
         {
-            _viewController = viewController;
+            _viewService = viewService;
         }
 
         public override void Activate()
         {
-            _viewController.HideAllByType(ViewType.Hint);
+            _viewService.HideAllByType(ViewType.Hint);
         }
     }
 }

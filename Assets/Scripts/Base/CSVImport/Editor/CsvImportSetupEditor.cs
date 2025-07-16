@@ -88,7 +88,7 @@ namespace CsvImport
         private static bool ParseRegistry(CsvImportParser parser, ScriptableObject registryObject, TextAsset csvFileObject)
         {
             var isRegistryList = registryObject is IRegistryList;
-            var isRegistry = registryObject is IRegistryClass;
+            var isRegistry = registryObject is IRegistry;
 
             var parseResult = false;
             

@@ -1,4 +1,5 @@
 ﻿using System;
+using Cysharp.Threading.Tasks;
 
 namespace ApplicationMode.States
 {
@@ -9,7 +10,7 @@ namespace ApplicationMode.States
         
         bool StopSequenceOnFail { get; }
         
-        void Apply();
+        UniTaskVoid Apply();
         void Clear();
     }
 }

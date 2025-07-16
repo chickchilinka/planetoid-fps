@@ -1,13 +1,12 @@
-﻿using UnityEngine;
-using DG.Tweening;
+﻿using DG.Tweening;
 using TMPro;
+using UnityEngine;
 
-namespace View
+namespace Features.ViewComponents
 {
     [RequireComponent(typeof(TextMeshProUGUI))]
     public class AnimatedTextView : MonoBehaviour
     {
-#pragma warning disable 0649
         [SerializeField] private float _animationDuration;
         [SerializeField] private TextMeshProUGUI _animatedText;
 

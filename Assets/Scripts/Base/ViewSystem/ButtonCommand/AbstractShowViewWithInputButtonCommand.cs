@@ -10,14 +10,14 @@ namespace ViewSystem.ButtonCommand
         where TView : class, IViewWithInput<TViewInput>
         where TViewInput : IViewInput
     {
-        private IViewController _viewController;
+        private IViewService _viewService;
 
         private TViewInput _viewInput;
 
         [Inject]
-        public void Construct(IViewController viewController)
+        public void Construct(IViewService viewService)
         {
-            _viewController = viewController;
+            _viewService = viewService;
         }
 
         public void BindData(TViewInput viewInput)
@@ -33,8 +33,8 @@ namespace ViewSystem.ButtonCommand
                 return;
             }
             
-            if (!_viewController.IsViewShowing(typeof(TView)))
-                _viewController.ShowView<TView, TViewInput>(_viewInput);
+            if (!_viewService.IsViewShowing(typeof(TView)))
+                _viewService.ShowView<TView, TViewInput>(_viewInput);
         }
     }
 }

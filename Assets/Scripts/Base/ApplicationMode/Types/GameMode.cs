@@ -10,13 +10,9 @@ namespace ApplicationMode.Types
             {
                 Factory.Resolve<StartSessionState>(),
 
-                Factory.Resolve<DelayLoadingState>(),
-
                 // Factory.Resolve<DownloadActualAddressablesState>(),
-
-                Factory.Resolve<DelayLoadingState>(),
-
-                Factory.Resolve<ShowInitialWindowState>()
+                
+                Factory.Resolve<LoadTestSceneState>()
             };
         }
     }

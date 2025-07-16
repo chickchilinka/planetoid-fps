@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Utils.View
+namespace Features.ViewComponents
 {
     public class TapData
     {

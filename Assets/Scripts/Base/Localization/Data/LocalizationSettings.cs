@@ -1,17 +1,16 @@
 ﻿using System;
-using Localization.Registry;
+using Base.Localization.Registry;
 using Registry;
 using UnityEngine;
 
-namespace Localization.Data
+namespace Base.Localization.Data
 {
     [Serializable]
     public class LocalizationSettings : IRegistryData
     {
         public string Id => Code;
         public string Code;
-        public string Title;
-        public Sprite Icon;
+        public SystemLanguage SystemLanguage;
         public LanguageSettingsRegistry LocalizationSettingsRegistry;
     }
 }

@@ -1,19 +1,3 @@
-// MarrowMachine CONFIDENTIAL
-// __________________
-//
-// [2016] - [2024] MarrowMachine LLC
-// All Rights Reserved.
-//
-// NOTICE:  All information contained herein is, and remains
-// the property of MarrowMachine LLC and its suppliers,
-// if any.  The intellectual and technical concepts contained
-// herein are proprietary to MarrowMachine LLC
-// and its suppliers and may be covered by U.S. and Foreign Patents,
-// patents in process, and are protected by trade secret or copyright law.
-// Dissemination of this information or reproduction of this material
-// is strictly forbidden unless prior written permission is obtained
-// from MarrowMachine LLC.
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -35,7 +19,7 @@ namespace AddressableAssetsSystem.Services
         private readonly AssetsService _assetsService;
         private readonly DownloadAssetsService _downloadAssetsService;
         private readonly AssetsModel _assetsModel;
-        private readonly IViewController _viewController;
+        private readonly IViewService _viewService;
 
         public bool IsAllNecessaryAssetsLoaded => _assetsService.IsAllNecessaryAssetsLoaded;
         public long DownloadAssetsSize => _assetsModel.Size;
@@ -48,14 +32,14 @@ namespace AddressableAssetsSystem.Services
             AssetsService assetsService,
             DownloadAssetsService downloadAssetsService,
             AssetsModel assetsModel,
-            IViewController viewController)
+            IViewService viewService)
         {
             _packsCatalogReference = packsCatalogReference;
             _catalogFallback = catalogFallback;
             _assetsService = assetsService;
             _downloadAssetsService = downloadAssetsService;
             _assetsModel = assetsModel;
-            _viewController = viewController;
+            _viewService = viewService;
         }
         
         public async UniTask Initialize()

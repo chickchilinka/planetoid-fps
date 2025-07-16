@@ -7,11 +7,12 @@ using Registry;
 using UniRx;
 using UnityEditor;
 using UnityEngine;
+using Utils.Debugger;
 
 namespace Utils
 {
     [CustomEditor(typeof(GoogleSheetsImporter))]
-    public class GoogleSheetsImporterEditor : UnityEditor.Editor
+    public class GoogleSheetsImporterEditor : Editor
     {
         private readonly ReactiveProperty<int> _count = new ReactiveProperty<int>();
         private readonly CompositeDisposable _disposables = new CompositeDisposable();
@@ -191,7 +192,7 @@ namespace Utils
                         _count.Value++;
                     }, ex =>
                     {
-                        parser.LogWarning($"[CsvImportUtils] URL: '{url.stringValue}\n Exception: '{ex.ToString()}'");
+                        PrintLog.Warn($"[CsvImportUtils] URL: '{url.stringValue}\n Exception: '{ex.ToString()}'");
                         _count.Value++;
                     });
 
@@ -271,7 +272,7 @@ namespace Utils
         private static bool ParseRegistry(CsvImportParser parser, ScriptableObject registryObject, string csvObject)
         {
             var isRegistryList = registryObject is IRegistryList;
-            var isRegistry = registryObject is IRegistryClass;
+            var isRegistry = registryObject is IRegistry;
             var parseResult = false;
 
             if (!isRegistryList && !isRegistry)

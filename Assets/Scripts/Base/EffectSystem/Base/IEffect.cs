@@ -2,7 +2,7 @@
 using Pool;
 using UnityEngine;
 
-namespace EffectSystem.Base
+namespace Base.EffectSystem.Base
 {
     public interface IEffect : IPoolable
     {
