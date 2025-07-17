@@ -49,7 +49,7 @@ A small Unity project demonstrating custom surface gravity, 3rd‑person movemen
 
 ## 🗣 About Me
 
-This is an early, in‑development prototype—my personal rewrite of Hot Planet game (https://youtu.be/uvDixcYVbT8) I've made long time ago. 
-I’m actively iterating on it to shape a standalone MVP I can take to market.
+This is an early, in‑development prototype - my personal rewrite of Hot Planet game (https://youtu.be/uvDixcYVbT8) I've made long time ago. 
+I’m actively iterating on it to shape a standalone MVP I can release.
 
 
