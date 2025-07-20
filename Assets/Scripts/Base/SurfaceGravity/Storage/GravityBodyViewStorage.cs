@@ -3,8 +3,7 @@ using Base.SurfaceGravity.View;
 
 namespace Base.SurfaceGravity.Storage
 {
-    internal class GravityPlanetStorage: DictionaryStorage<string, GravityPlanet>
+    internal class GravityBodyViewStorage: DictionaryStorage<string, GravityBodyView>
     {
-        
     }
 }

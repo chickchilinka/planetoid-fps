@@ -1,7 +1,5 @@
 using System.Collections.Generic;
-using System.Linq;
 using Base.SurfaceGravity.Data;
-using Base.SurfaceGravity.Model;
 using Base.SurfaceGravity.Storage;
 using Base.SurfaceGravity.Utils;
 using Base.SurfaceGravity.View;
@@ -12,18 +10,18 @@ namespace Base.SurfaceGravity.Services
 {
     public class SurfaceGravityService : IFixedTickable
     {
-        private readonly GravityBodyStorage _bodyStorage;
+        private readonly GravityBodyViewStorage _bodyViewStorage;
         private readonly GravityBodyModelStorage _bodyModelStorage;
-        private readonly GravityPlanetStorage _planetStorage;
+        private readonly GravityPlanetViewStorage _planetViewStorage;
         private readonly SurfaceGravitySettings _gravitySettings;
 
         private readonly int _groundMask;
 
-        internal SurfaceGravityService(GravityBodyStorage body, GravityPlanetStorage storage,
+        internal SurfaceGravityService(GravityBodyViewStorage bodyView, GravityPlanetViewStorage viewStorage,
             SurfaceGravitySettings gravitySettings, GravityBodyModelStorage bodyModelStorage)
         {
-            _bodyStorage = body;
-            _planetStorage = storage;
+            _bodyViewStorage = bodyView;
+            _planetViewStorage = viewStorage;
             _gravitySettings = gravitySettings;
             _bodyModelStorage = bodyModelStorage;
             _groundMask = LayerMask.GetMask(SurfaceGravityConst.SurfaceGravityLayerName);
@@ -33,7 +31,7 @@ namespace Base.SurfaceGravity.Services
         {
             if (!_bodyModelStorage.TryGetValue(id, out var bodyModel))
                 throw new KeyNotFoundException($"No gravity body model found with id: {id}");
-            
+
             return bodyModel.SmoothNormal;
         }
 
@@ -41,15 +39,14 @@ namespace Base.SurfaceGravity.Services
         {
             var dt = Time.fixedDeltaTime;
 
-            foreach (var (id, body) in _bodyStorage.Dictionary)
+            foreach (var (id, body) in _bodyViewStorage.Dictionary)
             {
-                if(!_bodyModelStorage.TryGetValue(id, out var model))
-                    throw new KeyNotFoundException($"No gravity body model found with id: {id}");
-                
+                var model = _bodyModelStorage.GetOrThrow(id);
+
                 var origin = body.transform.position;
                 var down = -body.transform.up;
 
-                if (Physics.SphereCast(origin,
+                if (body.LerpUpToNormal && Physics.SphereCast(origin,
                         _gravitySettings.SphereRadius,
                         down,
                         out var hit,
@@ -57,23 +54,72 @@ namespace Base.SurfaceGravity.Services
                         _groundMask,
                         QueryTriggerInteraction.Ignore))
                 {
-                    model.SmoothNormal = Vector3.Slerp(model.SmoothNormal,
+                    model.SmoothNormal = Vector3.Slerp(
+                        model.SmoothNormal,
                         hit.normal,
-                        _gravitySettings.NormalLerpSpeed * dt);
+                        _gravitySettings.NormalLerpSpeed * dt
+                    );
+                }
+                else
+                {
+                    var planet = FindClosestPlanet(origin);
+                    if (planet != null)
+                    {
+                        var cp = planet.GetClosestPoint(origin);
+                        var dir = (origin - cp).normalized;
+
+                        model.SmoothNormal = Vector3.Slerp(
+                            model.SmoothNormal,
+                            dir,
+                            _gravitySettings.NormalLerpSpeed * dt
+                        );
+                    }
                 }
 
-                body.Rigidbody.AddForce(-model.SmoothNormal *
-                                        _gravitySettings.GravityAcceleration,
-                    ForceMode.Acceleration);
+                body.Rigidbody.AddForce(
+                    -model.SmoothNormal * _gravitySettings.GravityAcceleration,
+                    ForceMode.Acceleration
+                );
 
-                var target = Quaternion.FromToRotation(body.transform.up,
-                                 model.SmoothNormal) *
-                             body.Rigidbody.rotation;
+                if (!body.LerpUpToNormal)
+                    continue;
 
-                body.Rigidbody.MoveRotation(Quaternion.RotateTowards(body.Rigidbody.rotation,
-                    target,
-                    _gravitySettings.MaxRotateDeg));
+                var target = Quaternion.FromToRotation(
+                    body.transform.up,
+                    model.SmoothNormal
+                ) * body.Rigidbody.rotation;
+
+                body.Rigidbody.MoveRotation(
+                    Quaternion.RotateTowards(
+                        body.Rigidbody.rotation,
+                        target,
+                        _gravitySettings.MaxRotateDeg
+                    )
+                );
             }
+        }
+
+        private GravityPlanetView FindClosestPlanet(Vector3 pos)
+        {
+            GravityPlanetView best = null;
+            var bestSqrMagnitude = float.MaxValue;
+            var searchRadius = _gravitySettings.PlanetSearchRadius;
+
+            foreach (var planet in _planetViewStorage.Dictionary.Values)
+            {
+                var sqrMagnitude = (planet.transform.position - pos).sqrMagnitude;
+
+                if (sqrMagnitude > searchRadius * searchRadius)
+                    continue;
+
+                if (sqrMagnitude >= bestSqrMagnitude)
+                    continue;
+
+                bestSqrMagnitude = sqrMagnitude;
+                best = planet;
+            }
+
+            return best;
         }
     }
 }

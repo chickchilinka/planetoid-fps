@@ -27,5 +27,12 @@ namespace Base.Common.Storage
         {
             return _dictionary.TryGetValue(key, out value);
         }
+
+        public virtual TValue GetOrThrow(TKey key)
+        {
+            if(!_dictionary.TryGetValue(key, out var value))
+                throw new KeyNotFoundException();
+            return value;
+        }
     }
 }

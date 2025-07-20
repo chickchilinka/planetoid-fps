@@ -12,8 +12,8 @@ namespace Features.Character.Movement.Bootstrap
     {
         [SerializeField] 
         private MovementSettings _movementSettings;
-        [SerializeField]
-        private GravityBody _characterBody;
+        [FormerlySerializedAs("_characterBody")] [SerializeField]
+        private GravityBodyView _characterBodyView;
         [SerializeField]
         private Transform _cameraRoot;
         public override void InstallBindings()
@@ -22,13 +22,13 @@ namespace Features.Character.Movement.Bootstrap
             Container.BindInterfacesAndSelfTo<RigidbodyMovementController>().AsSingle().OnInstantiated((_, obj) =>
             {
                 var controller = obj as RigidbodyMovementController;
-                controller!.SetRigidBody(_characterBody.Rigidbody);
+                controller!.SetRigidBody(_characterBodyView.Rigidbody);
             });
             Container.BindInterfacesAndSelfTo<MovementInputProvider>().AsSingle();
             Container.BindInterfacesAndSelfTo<MovementDirectionProvider>().AsSingle().OnInstantiated((_, obj) =>
             {
                 var provider = obj as MovementDirectionProvider;
-                provider!.Initialize(_characterBody.Id, _cameraRoot);
+                provider!.Initialize(_characterBodyView.Id, _cameraRoot);
             });
         }
     }

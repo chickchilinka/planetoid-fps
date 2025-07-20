@@ -8,7 +8,7 @@ using Zenject;
 namespace Base.SurfaceGravity.View
 {
     [RequireComponent(typeof(Rigidbody))]
-    public class GravityBody : MonoBehaviour, IIdentified
+    public class GravityBodyView : MonoBehaviour, IIdentified
     {
         [SerializeField] private bool _lerpUpToNormal;
         public bool LerpUpToNormal => _lerpUpToNormal;
