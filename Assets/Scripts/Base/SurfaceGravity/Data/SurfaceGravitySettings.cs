@@ -17,5 +17,8 @@ namespace Base.SurfaceGravity.Data
         
         [field:SerializeField]
         public float GravityAcceleration { get; private set; } = 9.81f;
+        
+        [field:SerializeField]
+        public float PlanetSearchRadius { get; private set; } = 300f;
     }
 }

@@ -6,42 +6,42 @@ namespace Base.SurfaceGravity.Services
 {
     internal class SurfaceGravityManagementService
     {
-        private readonly GravityBodyStorage _gravityBodies;
+        private readonly GravityBodyViewStorage _gravityBodiesView;
         private readonly GravityBodyModelStorage _gravityBodyModels;
-        private readonly GravityPlanetStorage _gravityPlanets;
+        private readonly GravityPlanetViewStorage _gravityPlanetsView;
 
-        public SurfaceGravityManagementService(GravityBodyStorage gravityBodies, GravityBodyModelStorage gravityBodyModel,
-            GravityPlanetStorage gravityPlanets)
+        public SurfaceGravityManagementService(GravityBodyViewStorage gravityBodiesView, GravityBodyModelStorage gravityBodyModel,
+            GravityPlanetViewStorage gravityPlanetsView)
         {
-            _gravityBodies = gravityBodies;
+            _gravityBodiesView = gravityBodiesView;
             _gravityBodyModels = gravityBodyModel;
-            _gravityPlanets = gravityPlanets;
+            _gravityPlanetsView = gravityPlanetsView;
         }
 
-        internal void RegisterBody(GravityBody body)
+        internal void RegisterBody(GravityBodyView bodyView)
         {
-            var model = new GravityBodyModel(body.Id)
+            var model = new GravityBodyModel(bodyView.Id)
             {
-                SmoothNormal = body.transform.up
+                SmoothNormal = bodyView.transform.up
             };
             _gravityBodyModels.Add(model.Id, model);
-            _gravityBodies.Add(body.Id, body);
+            _gravityBodiesView.Add(bodyView.Id, bodyView);
         }
 
-        internal void RegisterPlanet(GravityPlanet planet)
+        internal void RegisterPlanet(GravityPlanetView planetView)
         {
-            _gravityPlanets.Add(planet.Id, planet);
+            _gravityPlanetsView.Add(planetView.Id, planetView);
         }
 
-        internal void UnregisterBody(GravityBody body)
+        internal void UnregisterBody(GravityBodyView bodyView)
         {
-            _gravityBodies.Remove(body.Id);
-            _gravityBodyModels.Remove(body.Id);
+            _gravityBodiesView.Remove(bodyView.Id);
+            _gravityBodyModels.Remove(bodyView.Id);
         }
 
-        internal void UnregisterPlanet(GravityPlanet planet)
+        internal void UnregisterPlanet(GravityPlanetView planetView)
         {
-            _gravityPlanets.Remove(planet.Id);
+            _gravityPlanetsView.Remove(planetView.Id);
         }
     }
 }

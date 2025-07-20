@@ -14,8 +14,8 @@ namespace Base.SurfaceGravity.Bootstrap
         public override void InstallBindings()
         {
             Container.InstallAsSingle<GravityBodyModelStorage>();
-            Container.InstallAsSingle<GravityBodyStorage>();
-            Container.InstallAsSingle<GravityPlanetStorage>();
+            Container.InstallAsSingle<GravityBodyViewStorage>();
+            Container.InstallAsSingle<GravityPlanetViewStorage>();
             
             Container.InstallAsSingle<SurfaceGravityService>();
             Container.InstallAsSingle<SurfaceGravityManagementService>();

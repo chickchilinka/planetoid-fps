@@ -261,3 +261,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e2a21296699a4f9fbb628452a87857f2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _gravitySettings:
+    <SphereRadius>k__BackingField: 0.25
+    <MaxRotateDeg>k__BackingField: 45
+    <RayLength>k__BackingField: 2
+    <NormalLerpSpeed>k__BackingField: 6
+    <GravityAcceleration>k__BackingField: 9.81
+    <PlanetSearchRadius>k__BackingField: 300
