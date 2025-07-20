@@ -2,13 +2,12 @@
 using System.Collections.Generic;
 using System.Threading;
 using AddressableAssetsSystem.Services;
+using Base.Common.Log;
 using Cysharp.Threading.Tasks;
 using Scene.Data;
 using UniRx;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using Utils.Debugger;
-using Utils.Extensions;
 using Zenject;
 
 namespace Scene

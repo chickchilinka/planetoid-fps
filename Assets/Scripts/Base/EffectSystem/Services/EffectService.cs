@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Base.Common.Utils.Extensions;
 using Base.EffectSystem.Base;
 using Base.EffectSystem.Data;
 using Base.EffectSystem.Factory;
 using EffectSystem;
-using Utils.Extensions;
 
 namespace Base.EffectSystem.Services
 {

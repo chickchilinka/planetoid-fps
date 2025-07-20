@@ -1,6 +1,6 @@
 ﻿using System;
+using Base.Common.Registry;
 using Base.Localization.Data;
-using Registry;
 using UnityEngine;
 
 namespace Base.Localization.Registry

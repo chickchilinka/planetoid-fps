@@ -6,9 +6,9 @@ using System.Linq;
 using System.Text;
 using AddressableAssetsSystem.Data;
 using AddressableAssetsSystem.Handler;
+using Base.Common.Utils.Extensions;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
-using Utils.Extensions;
 using Zenject;
 using AddressableAssets = UnityEngine.AddressableAssets;
 

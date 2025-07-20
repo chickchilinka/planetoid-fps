@@ -152,8 +152,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9310ac8ce6394c60871b0aaf80ec8f4e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rayLength: 100
-  NormalLerpSpeed: 6
+  _lerpUpToNormal: 1
 --- !u!114 &3061939698782146140
 MonoBehaviour:
   m_ObjectHideFlags: 0

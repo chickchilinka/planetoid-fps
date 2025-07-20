@@ -1,14 +1,14 @@
+using Base.Common.Log;
 using Scene;
 using Scene.Data;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using Utils;
-using Utils.Debugger;
 
+//TODO: Add clearing saved player data and game data
 public class GameMenu
 {
-    private const string EditorPath = "Game/";
     private const string MainGamePath = "Game/";
     private const string MenuPath = "Game/";
 
@@ -16,8 +16,6 @@ public class GameMenu
     public static void ClearAll()
     {
         Caching.ClearCache();
-        PlayerPrefs.DeleteKey(Const.Keys.PrefsPlayerDataKey);
-        PlayerPrefs.DeleteKey(Const.Keys.PrefsGameDataKey);
         PlayerPrefs.Save();
     }
     
@@ -25,7 +23,6 @@ public class GameMenu
     public static void ClearPlayerData()
     {
         Caching.ClearCache();
-        PlayerPrefs.DeleteKey(Const.Keys.PrefsPlayerDataKey);
         PlayerPrefs.Save();
         PrintLog.Info($"{LogTag.System} PlayerData wiped from the device!");
     }
@@ -34,7 +31,6 @@ public class GameMenu
     public static void ClearGameData()
     {
         Caching.ClearCache();
-        PlayerPrefs.DeleteKey(Const.Keys.PrefsGameDataKey);
         PlayerPrefs.Save();
     }
         

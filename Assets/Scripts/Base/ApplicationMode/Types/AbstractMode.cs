@@ -1,8 +1,8 @@
 ﻿using System;
 using ApplicationMode.States;
 using Base.ApplicationMode;
+using Base.Common.Log;
 using General;
-using Utils.Debugger;
 using Zenject;
 
 namespace ApplicationMode.Types

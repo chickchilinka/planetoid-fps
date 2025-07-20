@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
+using Base.SurfaceGravity.Data;
+using Base.SurfaceGravity.Model;
 using Base.SurfaceGravity.Storage;
 using Base.SurfaceGravity.Utils;
 using Base.SurfaceGravity.View;
@@ -10,74 +12,67 @@ namespace Base.SurfaceGravity.Services
 {
     public class SurfaceGravityService : IFixedTickable
     {
-        private const float SphereRadius = 0.25f;
-        private const float MaxRotateDeg = 45f;
-
         private readonly GravityBodyStorage _bodyStorage;
+        private readonly GravityBodyModelStorage _bodyModelStorage;
         private readonly GravityPlanetStorage _planetStorage;
-
-        private class BodyState
-        {
-            public Vector3 smoothNormal;
-            public Quaternion targetRot;
-        }
-
-        private readonly Dictionary<GravityBody, BodyState> _state = new();
+        private readonly SurfaceGravitySettings _gravitySettings;
 
         private readonly int _groundMask;
 
-        public SurfaceGravityService(GravityBodyStorage b, GravityPlanetStorage p)
+        internal SurfaceGravityService(GravityBodyStorage body, GravityPlanetStorage storage,
+            SurfaceGravitySettings gravitySettings, GravityBodyModelStorage bodyModelStorage)
         {
-            _bodyStorage = b;
-            _planetStorage = p;
+            _bodyStorage = body;
+            _planetStorage = storage;
+            _gravitySettings = gravitySettings;
+            _bodyModelStorage = bodyModelStorage;
             _groundMask = LayerMask.GetMask(SurfaceGravityConst.SurfaceGravityLayerName);
         }
 
-
-        public Vector3 GetBodyUp(Rigidbody body)
+        public Vector3 GetBodyUp(string id)
         {
-            var gravityBody = _state.Keys.FirstOrDefault(gb => gb.Rb == body);
-            if (!gravityBody)
-                return body.transform.up;
-            return _state[gravityBody].smoothNormal;
+            if (!_bodyModelStorage.TryGetValue(id, out var bodyModel))
+                throw new KeyNotFoundException($"No gravity body model found with id: {id}");
+            
+            return bodyModel.SmoothNormal;
         }
 
         public void FixedTick()
         {
             var dt = Time.fixedDeltaTime;
 
-            foreach (var body in _bodyStorage.Bodies)
+            foreach (var (id, body) in _bodyStorage.Dictionary)
             {
-                if (!_state.TryGetValue(body, out var st))
-                    _state[body] = st = new BodyState { smoothNormal = body.transform.up };
-
+                if(!_bodyModelStorage.TryGetValue(id, out var model))
+                    throw new KeyNotFoundException($"No gravity body model found with id: {id}");
+                
                 var origin = body.transform.position;
                 var down = -body.transform.up;
 
                 if (Physics.SphereCast(origin,
-                        SphereRadius,
+                        _gravitySettings.SphereRadius,
                         down,
                         out var hit,
-                        body.rayLength,
+                        _gravitySettings.RayLength,
                         _groundMask,
                         QueryTriggerInteraction.Ignore))
                 {
-                    st.smoothNormal = Vector3.Slerp(st.smoothNormal,
+                    model.SmoothNormal = Vector3.Slerp(model.SmoothNormal,
                         hit.normal,
-                        body.NormalLerpSpeed * dt);
+                        _gravitySettings.NormalLerpSpeed * dt);
                 }
 
-                body.Rb.AddForce(-st.smoothNormal *
-                                 SurfaceGravityConst.GravityMultiplier,
+                body.Rigidbody.AddForce(-model.SmoothNormal *
+                                        _gravitySettings.GravityAcceleration,
                     ForceMode.Acceleration);
 
                 var target = Quaternion.FromToRotation(body.transform.up,
-                                 st.smoothNormal) *
-                             body.Rb.rotation;
+                                 model.SmoothNormal) *
+                             body.Rigidbody.rotation;
 
-                body.Rb.MoveRotation(Quaternion.RotateTowards(body.Rb.rotation,
+                body.Rigidbody.MoveRotation(Quaternion.RotateTowards(body.Rigidbody.rotation,
                     target,
-                    MaxRotateDeg));
+                    _gravitySettings.MaxRotateDeg));
             }
         }
     }

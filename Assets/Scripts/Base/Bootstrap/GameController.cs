@@ -1,6 +1,5 @@
 ﻿using ApplicationMode.Types;
 using UnityEngine;
-using Utils.Debugger;
 using Utils.Services;
 using Zenject;
 

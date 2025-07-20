@@ -246,12 +246,6 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 2408871016377230930}
   m_PrefabAsset: {fileID: 0}
---- !u!54 &816538530 stripped
-Rigidbody:
-  m_CorrespondingSourceObject: {fileID: 1568474989607624949, guid: d4c97b876a3fe9b47b60e5a76f8dbfae,
-    type: 3}
-  m_PrefabInstance: {fileID: 7458589561775110358}
-  m_PrefabAsset: {fileID: 0}
 --- !u!114 &816538535 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 3061939698782146140, guid: d4c97b876a3fe9b47b60e5a76f8dbfae,
@@ -262,6 +256,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 36694aaed707476aa7255d26d0577676, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &816538537 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2746162983883281462, guid: d4c97b876a3fe9b47b60e5a76f8dbfae,
+    type: 3}
+  m_PrefabInstance: {fileID: 7458589561775110358}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9310ac8ce6394c60871b0aaf80ec8f4e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1001 &1157053979
@@ -423,7 +429,7 @@ MonoBehaviour:
     AirControl: 0.3
     GroundCheckDistance: 1.1
     MaxJumpHoldTime: 1
-  _characterRigidBody: {fileID: 816538530}
+  _characterBody: {fileID: 816538537}
   _cameraRoot: {fileID: 553726494}
 --- !u!114 &1430080022
 MonoBehaviour:

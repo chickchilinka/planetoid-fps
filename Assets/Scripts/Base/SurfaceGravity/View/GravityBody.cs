@@ -1,3 +1,6 @@
+using System;
+using Base.Common;
+using Base.SurfaceGravity.Services;
 using Base.SurfaceGravity.Storage;
 using UnityEngine;
 using Zenject;
@@ -5,35 +8,38 @@ using Zenject;
 namespace Base.SurfaceGravity.View
 {
     [RequireComponent(typeof(Rigidbody))]
-    public class GravityBody : MonoBehaviour
+    public class GravityBody : MonoBehaviour, IIdentified
     {
-        [Header("Ray")] 
-        public float rayLength = 3f;
+        [SerializeField] private bool _lerpUpToNormal;
+        public bool LerpUpToNormal => _lerpUpToNormal;
+        public string Id { get; } = Guid.NewGuid().ToString();
 
-        [Header("Smoothing")] 
-        public float NormalLerpSpeed = 10f;
+        public Rigidbody Rigidbody => _rigidbody ??= GetComponent<Rigidbody>();
 
-        public Rigidbody Rb { get; private set; }
+        private Rigidbody _rigidbody;
 
-        private GravityBodyStorage _storage;
+        private SurfaceGravityManagementService _gravityManagementService;
 
         [Inject]
-        public void Construct(GravityBodyStorage storage)
+        internal void Construct(SurfaceGravityManagementService gravityManagementService)
         {
-            _storage = storage;
+            _gravityManagementService = gravityManagementService;
         }
 
         private void Awake()
         {
-            Rb = GetComponent<Rigidbody>();
-            Rb.useGravity = false;
-            Rb.constraints = RigidbodyConstraints.FreezeRotation;
-            _storage.Add(this);
+            _rigidbody ??= GetComponent<Rigidbody>();
+            _rigidbody.useGravity = false;
+
+            if (_lerpUpToNormal)
+                _rigidbody.constraints = RigidbodyConstraints.FreezeRotation;
+
+            _gravityManagementService.RegisterBody(this);
         }
 
         private void OnDestroy()
         {
-            _storage.Remove(this);
+            _gravityManagementService.UnregisterBody(this);
         }
     }
 }

@@ -1,13 +1,13 @@
 using System;
 using AddressableAssetsSystem.Attributes;
-using General.Data;
+using Base.Common.Registry;
 using UnityEngine;
 
 namespace AddressableAssetsSystem.Data
 {
     [Serializable]
     [CreateAssetMenu(fileName = "AssetsReferenceSettingsRegistry", menuName = "Registry/Settings/Local/Assets/AssetReferences")]
-    public class AssetReferenceSettingsRegistry : BaseGameSettingsList<AssetReferenceSettings>
+    public class AssetReferenceSettingsRegistry : RegistryListBase<AssetReferenceSettings>
     {
 #if UNITY_EDITOR
         [AttributeAssetLabel]
