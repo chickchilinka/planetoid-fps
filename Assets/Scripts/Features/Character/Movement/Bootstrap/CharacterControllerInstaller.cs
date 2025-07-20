@@ -12,7 +12,7 @@ namespace Features.Character.Movement.Bootstrap
     {
         [SerializeField] 
         private MovementSettings _movementSettings;
-        [FormerlySerializedAs("_characterBody")] [SerializeField]
+        [SerializeField]
         private GravityBodyView _characterBodyView;
         [SerializeField]
         private Transform _cameraRoot;
