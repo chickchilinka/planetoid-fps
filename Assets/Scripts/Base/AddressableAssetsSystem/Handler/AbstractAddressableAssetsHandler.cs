@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using AddressableAssetsSystem.Services;
-using Utils.Extensions;
+using Base.Common.Utils.Extensions;
 using Zenject;
 
 namespace AddressableAssetsSystem.Handler

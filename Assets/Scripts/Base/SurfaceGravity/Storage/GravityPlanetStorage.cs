@@ -1,14 +1,10 @@
-using System.Collections.Generic;
+using Base.Common.Storage;
 using Base.SurfaceGravity.View;
 
 namespace Base.SurfaceGravity.Storage
 {
-    public class GravityPlanetStorage
+    internal class GravityPlanetStorage: DictionaryStorage<string, GravityPlanet>
     {
-        private readonly List<GravityPlanet> _items = new();
-        public IReadOnlyList<GravityPlanet> Items => _items;
-
-        public void Add(GravityPlanet p) => _items.Add(p);
-        public void Remove(GravityPlanet p) => _items.Remove(p);
+        
     }
 }

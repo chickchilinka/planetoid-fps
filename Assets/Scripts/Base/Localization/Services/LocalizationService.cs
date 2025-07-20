@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Base.Common.Log;
 using Base.Localization.Data;
 using Base.Localization.Registry;
 using UnityEngine;
-using Utils.Debugger;
 
 namespace Base.Localization.Services
 {

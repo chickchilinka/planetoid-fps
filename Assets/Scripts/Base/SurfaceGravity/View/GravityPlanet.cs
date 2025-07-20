@@ -1,3 +1,6 @@
+using System;
+using Base.Common;
+using Base.SurfaceGravity.Services;
 using Base.SurfaceGravity.Storage;
 using Base.SurfaceGravity.Utils;
 using UnityEngine;
@@ -5,20 +8,17 @@ using Zenject;
 
 namespace Base.SurfaceGravity.View
 {
-    public class GravityPlanet : MonoBehaviour
+    public class GravityPlanet : MonoBehaviour, IIdentified
     {
         [SerializeField] private MeshCollider _gravityCollider;
-
-        [field: SerializeField]
-        [field: HideInInspector]
-        public Vector3[] GravityPoints { get; private set; }
-
-        private GravityPlanetStorage _storage;
+        public string Id { get; } = Guid.NewGuid().ToString();
+        
+        private SurfaceGravityManagementService _surfaceGravity;
 
         [Inject]
-        public void Construct(GravityPlanetStorage storage)
+        internal void Construct(SurfaceGravityManagementService surfaceGravity)
         {
-            _storage = storage;
+            _surfaceGravity = surfaceGravity;
         }
 
         private void Awake()
@@ -27,32 +27,17 @@ namespace Base.SurfaceGravity.View
                 throw new MissingComponentException("No gravity collider was set");
             
             _gravityCollider.gameObject.layer = LayerMask.NameToLayer(SurfaceGravityConst.SurfaceGravityLayerName);
-            BakePoints();
-            _storage.Add(this);
+            _surfaceGravity.RegisterPlanet(this);
         }
 
         private void OnDestroy()
         {
-            _storage.Remove(this);
+            _surfaceGravity.UnregisterPlanet(this);
         }
 
-        [ContextMenu("Bake Points")]
-        void BakePoints()
+        internal Vector3 GetClosestPoint(Vector3 position)
         {
-            var mesh = _gravityCollider.sharedMesh;
-            var verts = mesh.vertices;
-            var tris = mesh.triangles;
-
-            GravityPoints = new Vector3[tris.Length / 3];
-            var j = 0;
-
-            for (var i = 0; i < tris.Length; i += 3)
-            {
-                var p0 = transform.TransformPoint(verts[tris[i]]);
-                var p1 = transform.TransformPoint(verts[tris[i + 1]]);
-                var p2 = transform.TransformPoint(verts[tris[i + 2]]);
-                GravityPoints[j++] = (p0 + p1 + p2) / 3f;
-            }
+            return _gravityCollider.ClosestPoint(position);
         }
     }
 }

@@ -1,23 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Base.Common.Log;
+using Base.Common.Utils.Extensions;
 using UnityEngine;
-using Utils.Debugger;
-using Utils.Extensions;
 using Random = System.Random;
 
 namespace Utils.Services
 {
     public class RandomService
     {
+        private const int DefaultSeed = 0;
+        private const float Threshold = 0.01f;
+        private const int InvalidIndex = -1;
+        
         private Random _random;
         private int _seed;
         
         public int Seed => _seed;
 
-        public void Initialize(int seed = Const.Values.DefaultSeed)
+        public void Initialize(int seed = DefaultSeed)
         {
-            if (seed == Const.Values.DefaultSeed)
+            if (seed == DefaultSeed)
                 seed = (int) DateTime.Now.Ticks;
             seed = -2004336040;
             _seed = seed;
@@ -84,7 +88,7 @@ namespace Utils.Services
 
             var total = weights.Sum();
 
-            if (Math.Abs(total) < Const.Values.Threshold)
+            if (Math.Abs(total) < Threshold)
                 return 0;
 
             var randomValue = GetRandomIntValue(0, (int)total);
@@ -120,7 +124,7 @@ namespace Utils.Services
             }
 
             if (copyWithoutExceptList.IsNullOrEmpty())
-                return Const.Values.InvalidIndex;
+                return InvalidIndex;
 
             var randomIndex = GetRandomIntValue(0, copyWithoutExceptList.Count);
 

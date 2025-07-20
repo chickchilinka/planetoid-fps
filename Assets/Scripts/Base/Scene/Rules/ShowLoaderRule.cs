@@ -1,5 +1,5 @@
 ﻿using System;
-using Rule;
+using Base.Common.Rule;
 using Scene.Data;
 using Scene.View;
 using UniRx;

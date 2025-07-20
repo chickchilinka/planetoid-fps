@@ -5,6 +5,7 @@ using General;
 using Localization.View;
 using UniRx;
 using UnityEngine;
+using UnityEngine.Serialization;
 using Utils;
 using ViewSystem;
 using ViewSystem.Attributes;
@@ -21,12 +22,15 @@ namespace Scene.View
         [Space]
         [SerializeField] [Range(1, 10)] private int _maxDots;
         [SerializeField] [Range(0.01f, 3f)] private float _intervalSecondsBetweenDots;
+        [SerializeField] private string _loadingFormatKey = "loadingFormatKey";
+        [SerializeField] private string _assetsLoadingKey = "assetsLoadingKey";
+
 
         public override ViewLayer ViewLayer => ViewLayer.Global;
 
         private const float FullProgressDuration = 1f;
         private const float ProgressChangeDuration = 0.1f;
-
+        private const int BytesInMb = 1024 * 1024;
         private SignalBus _signalBus;
         private AddressableAssetsService _service;
 
@@ -37,7 +41,7 @@ namespace Scene.View
         private int _dotsCount;
         private string _dotsText;
 
-        private string _loadingTextKey = Const.LocalizationKeys.LoadingFormatKey;
+        private string _loadingTextKey;
 
         [Inject]
         public void Construct(SignalBus signalBus, AddressableAssetsService service)
@@ -61,7 +65,7 @@ namespace Scene.View
 
             ChangeProgress(1f, FullProgressDuration);
 
-            _loadingTextKey = Const.LocalizationKeys.LoadingFormatKey;
+            _loadingTextKey = _loadingFormatKey;
             _dotsCount = 0;
 
             UpdateDotsView();
@@ -76,9 +80,9 @@ namespace Scene.View
                 _progressStream = _service.DownloadProgress.Subscribe(x =>
                 {
                     ChangeProgress(x, ProgressChangeDuration);
-                    _loadingText.SetFormat(Const.LocalizationKeys.AssetsLoadingKey,
-                        (_service.DownloadAssetsSize * x / Const.Values.BytesInMb).ToString("F2"),
-                        (_service.DownloadAssetsSize / Const.Values.BytesInMb).ToString("F2"));
+                    _loadingText.SetFormat(_assetsLoadingKey,
+                        (_service.DownloadAssetsSize * x / BytesInMb).ToString("F2"),
+                        (_service.DownloadAssetsSize / BytesInMb).ToString("F2"));
                 });
         }
 
@@ -120,8 +124,8 @@ namespace Scene.View
 
             _dotsText = string.Empty;
 
-            for (int i = 0; i < _dotsCount; i++)
-                _dotsText += Const.Signs.Dot;
+            for (var i = 0; i < _dotsCount; i++)
+                _dotsText += '.';
 
             UpdateText();
 

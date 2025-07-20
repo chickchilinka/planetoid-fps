@@ -1,5 +1,5 @@
 using System;
-using Registry;
+using Base.Common.Registry;
 
 namespace AddressableAssetsSystem.Data
 {

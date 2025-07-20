@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using Utils.Debugger;
+using Base.Common.Log;
 using ViewSystem.Attributes;
 using ViewSystem.Base;
 using ViewSystem.Handler;

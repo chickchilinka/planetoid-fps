@@ -2,14 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using AddressableAssetsSystem.Registry;
-using General.Data;
+using Base.Common.Registry;
 using UnityEngine;
 
 namespace AddressableAssetsSystem.Data
 {
     [Serializable]
     [CreateAssetMenu(fileName = "AssetPackSettingsRegistry", menuName = "Registry/Settings/Local/Assets/AssetPacks")]
-    internal class AssetPacksCatalogRegistry : BaseGameSettingsList<AssetPackSettings>
+    internal class AssetPacksCatalogRegistry : RegistryListBase<AssetPackSettings>
     {
         public AssetPackSettings GetAssetPackSettingsById(string id)
         {
