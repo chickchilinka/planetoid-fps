@@ -1,7 +1,7 @@
 using System.Collections.Generic;
+using System.Linq;
 using Base.SurfaceGravity.Data;
 using Base.SurfaceGravity.Storage;
-using Base.SurfaceGravity.Utils;
 using Base.SurfaceGravity.View;
 using UnityEngine;
 using Zenject;
@@ -15,7 +15,7 @@ namespace Base.SurfaceGravity.Services
         private readonly GravityPlanetViewStorage _planetViewStorage;
         private readonly SurfaceGravitySettings _gravitySettings;
 
-        private readonly int _groundMask;
+        private LayerMask _gravityLayerMask;
 
         internal SurfaceGravityService(GravityBodyViewStorage bodyView, GravityPlanetViewStorage viewStorage,
             SurfaceGravitySettings gravitySettings, GravityBodyModelStorage bodyModelStorage)
@@ -24,7 +24,8 @@ namespace Base.SurfaceGravity.Services
             _planetViewStorage = viewStorage;
             _gravitySettings = gravitySettings;
             _bodyModelStorage = bodyModelStorage;
-            _groundMask = LayerMask.GetMask(SurfaceGravityConst.SurfaceGravityLayerName);
+
+            _gravityLayerMask = LayerMask.GetMask(_gravitySettings.SurfaceGravityLayerName);
         }
 
         public Vector3 GetBodyUp(string id)
@@ -44,45 +45,38 @@ namespace Base.SurfaceGravity.Services
                 var model = _bodyModelStorage.GetOrThrow(id);
 
                 var origin = body.transform.position;
-                var down = -body.transform.up;
+                var normal = (origin - model.CurrentClosestPoint).normalized;
 
-                if (body.LerpUpToNormal && Physics.SphereCast(origin,
-                        _gravitySettings.SphereRadius,
-                        down,
-                        out var hit,
-                        _gravitySettings.RayLength,
-                        _groundMask,
-                        QueryTriggerInteraction.Ignore))
+                if (body.LerpUpToNormal && SampleGroundNormal(body.transform, out normal))
                 {
                     model.SmoothNormal = Vector3.Slerp(
                         model.SmoothNormal,
-                        hit.normal,
+                        normal,
                         _gravitySettings.NormalLerpSpeed * dt
                     );
                 }
                 else
                 {
-                    var planet = FindClosestPlanet(origin);
-                    if (planet != null)
+                    if (FindClosestPoint(origin, out var cp))
                     {
-                        var cp = planet.GetClosestPoint(origin);
-                        var dir = (origin - cp).normalized;
-
-                        model.SmoothNormal = Vector3.Slerp(
-                            model.SmoothNormal,
-                            dir,
-                            _gravitySettings.NormalLerpSpeed * dt
-                        );
+                        model.CurrentClosestPoint = cp!.Value;
+                        normal = (origin - cp!.Value).normalized;
                     }
                 }
 
                 body.Rigidbody.AddForce(
-                    -model.SmoothNormal * _gravitySettings.GravityAcceleration,
+                    -normal * _gravitySettings.GravityAcceleration,
                     ForceMode.Acceleration
                 );
 
                 if (!body.LerpUpToNormal)
                     continue;
+
+                model.SmoothNormal = Vector3.Slerp(
+                    model.SmoothNormal,
+                    normal,
+                    _gravitySettings.NormalLerpSpeed * dt
+                );
 
                 var target = Quaternion.FromToRotation(
                     body.transform.up,
@@ -99,27 +93,76 @@ namespace Base.SurfaceGravity.Services
             }
         }
 
-        private GravityPlanetView FindClosestPlanet(Vector3 pos)
+        private bool FindClosestPoint(Vector3 position, out Vector3? closestPoint)
         {
-            GravityPlanetView best = null;
-            var bestSqrMagnitude = float.MaxValue;
-            var searchRadius = _gravitySettings.PlanetSearchRadius;
+            var maxHits = _planetViewStorage.Dictionary.Count;
+            var buffer = new Collider[maxHits];
+            var hitCount = Physics.OverlapSphereNonAlloc(
+                position,
+                _gravitySettings.PlanetSearchRadius,
+                buffer,
+                _gravityLayerMask,
+                QueryTriggerInteraction.Ignore
+            );
+            
+            closestPoint = null;
 
-            foreach (var planet in _planetViewStorage.Dictionary.Values)
+            GravityPlanetView bestPlanet = null;
+            var bestSqr = float.MaxValue;
+
+            for (var i = 0; i < hitCount; i++)
             {
-                var sqrMagnitude = (planet.transform.position - pos).sqrMagnitude;
-
-                if (sqrMagnitude > searchRadius * searchRadius)
+                var col = buffer[i];
+                var planet = _planetViewStorage.Dictionary.Values.FirstOrDefault(planet => planet.Collider == col);
+                if (!planet)
                     continue;
 
-                if (sqrMagnitude >= bestSqrMagnitude)
+                var cp = planet.GetClosestPoint(position);
+                var sq = (cp - position).sqrMagnitude;
+                if (sq >= bestSqr)
                     continue;
-
-                bestSqrMagnitude = sqrMagnitude;
-                best = planet;
+                
+                bestSqr = sq;
+                bestPlanet = planet;
+                closestPoint = cp;
             }
 
-            return best;
+            return bestPlanet;
+        }
+
+        private bool SampleGroundNormal(Transform transform, out Vector3 normal)
+        {
+            var offsets = new[]
+            {
+                Vector3.zero,
+                transform.right * _gravitySettings.SphereCastRadius,
+                -transform.right * _gravitySettings.SphereCastRadius,
+                transform.forward * _gravitySettings.SphereCastRadius,
+                -transform.forward * _gravitySettings.SphereCastRadius
+            };
+
+            var sum = Vector3.zero;
+            var cnt = 0;
+
+            foreach (var off in offsets)
+            {
+                if (!Physics.Raycast(
+                        transform.position + off,
+                        -transform.up,
+                        out var hit,
+                        _gravitySettings.RayLength,
+                        _gravityLayerMask,
+                        QueryTriggerInteraction.Ignore))
+                    continue;
+                sum += hit.normal;
+                cnt++;
+            }
+
+            normal = cnt > 0
+                ? (sum / cnt).normalized
+                : transform.up;
+
+            return cnt > 0;
         }
     }
 }

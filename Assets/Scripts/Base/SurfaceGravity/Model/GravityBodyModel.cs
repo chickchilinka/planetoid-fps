@@ -7,6 +7,7 @@ namespace Base.SurfaceGravity.Model
     {
         public string Id { get; }
         public Vector3 SmoothNormal { get; internal set; }
+        public Vector3 CurrentClosestPoint { get; internal set; }
 
         public GravityBodyModel(string id)
         {

@@ -7,7 +7,7 @@ namespace Base.SurfaceGravity.Data
     public class SurfaceGravitySettings
     {
         [field:SerializeField]
-        public float SphereRadius { get; private set; } = 0.25f;
+        public float SphereCastRadius { get; private set; } = 0.25f;
         [field:SerializeField]
         public float MaxRotateDeg { get; private set; } = 45f;
         [field:SerializeField]
@@ -20,5 +20,8 @@ namespace Base.SurfaceGravity.Data
         
         [field:SerializeField]
         public float PlanetSearchRadius { get; private set; } = 300f;
+        
+        [field:SerializeField]
+        public string SurfaceGravityLayerName { get; private set; } = "SurfaceGravity";
     }
 }
