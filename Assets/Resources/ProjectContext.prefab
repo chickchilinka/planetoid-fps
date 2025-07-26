@@ -262,9 +262,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _gravitySettings:
-    <SphereRadius>k__BackingField: 0.25
-    <MaxRotateDeg>k__BackingField: 45
+    <SphereCastRadius>k__BackingField: 0.25
+    <MaxRotateDeg>k__BackingField: 10
     <RayLength>k__BackingField: 2
-    <NormalLerpSpeed>k__BackingField: 6
+    <NormalLerpSpeed>k__BackingField: 4
     <GravityAcceleration>k__BackingField: 9.81
     <PlanetSearchRadius>k__BackingField: 300
+    <SurfaceGravityLayer>k__BackingField:
+      serializedVersion: 2
+      m_Bits: 64
