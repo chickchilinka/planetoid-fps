@@ -197,20 +197,20 @@ namespace MarrowMachine.Tools
                 BuildTarget.StandaloneLinux64);
         }
 
-        public static void PerformWindowsBuild()
+        public static void PerformWindowsBuild(string path = "windows/application.exe")
         {
             PlayerSettings.SetScriptingBackend(BuildTargetGroup.Standalone, ScriptingImplementation.IL2CPP);
 
-            GenericBuild("windows/application.exe",
+            GenericBuild(path,
                 BuildTargetGroup.Standalone,
                 BuildTarget.StandaloneWindows64);
         }
 
-        public static void PerformWindowsMonoBuild()
+        public static void PerformWindowsMonoBuild(string path = "windows/application.exe")
         {
             PlayerSettings.SetScriptingBackend(BuildTargetGroup.Standalone, ScriptingImplementation.Mono2x);
 
-            GenericBuild("windows/application.exe",
+            GenericBuild(path,
                 BuildTargetGroup.Standalone,
                 BuildTarget.StandaloneWindows64);
         }

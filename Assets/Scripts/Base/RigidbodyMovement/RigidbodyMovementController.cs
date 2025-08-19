@@ -16,7 +16,7 @@ namespace Base.RigidbodyMovement
 
         private readonly CompositeDisposable _subscriptions = new();
 
-        private Rigidbody _rigidbody;
+        private IRigidbody _rigidbody;
         private bool _isGrounded;
         private bool _jumpHeld;
         private bool _isJumping;
@@ -53,7 +53,7 @@ namespace Base.RigidbodyMovement
         
         public void FixedTick()
         {
-            if (!_rigidbody)
+            if (_rigidbody == null)
                 return;
 
             UpdateGroundedStatus();
@@ -62,7 +62,7 @@ namespace Base.RigidbodyMovement
             _jumpPressedThisFrame = false;
         }
 
-        public void SetRigidBody(Rigidbody rigidbody)
+        public void SetRigidBody(IRigidbody rigidbody)
         {
             _rigidbody = rigidbody;
         }
@@ -79,7 +79,7 @@ namespace Base.RigidbodyMovement
 
         private void UpdateGroundedStatus()
         {
-            var ray = new Ray(_rigidbody.position, -_movementDirectionProvider.Up);
+            var ray = new Ray(_rigidbody.Position, -_movementDirectionProvider.Up);
             _isGrounded = Physics.Raycast(ray, out _, _settings.GroundCheckDistance, ~0,
                 QueryTriggerInteraction.Ignore);
         }
@@ -94,7 +94,7 @@ namespace Base.RigidbodyMovement
             var desiredMove = forward * movementInput.y + right * movementInput.x;
             desiredMove = desiredMove.normalized * _settings.MoveSpeed;
 
-            var velocity = _rigidbody.linearVelocity;
+            var velocity = _rigidbody.LinearVelocity;
 
             var verticalVelocity = Vector3.Project(velocity, normal);
             var horizontalVelocity = velocity - verticalVelocity;
@@ -109,7 +109,7 @@ namespace Base.RigidbodyMovement
                     Vector3.Lerp(horizontalVelocity, desiredMove, _settings.AirControl * Time.deltaTime);
             }
 
-            _rigidbody.linearVelocity = horizontalVelocity + verticalVelocity;
+            _rigidbody.LinearVelocity = horizontalVelocity + verticalVelocity;
         }
 
         private void HandleJumpPhysics()
@@ -122,7 +122,7 @@ namespace Base.RigidbodyMovement
                 _isJumping = true;
                 _jumpHeld = true;
                 _jumpTime = 0f;
-                _rigidbody.linearVelocity -= Vector3.Project(_rigidbody.linearVelocity, normal);
+                _rigidbody.LinearVelocity -= Vector3.Project(_rigidbody.LinearVelocity, normal);
                 _rigidbody.AddForce(normal * _settings.InitialJumpForce, ForceMode.VelocityChange);
             }
 

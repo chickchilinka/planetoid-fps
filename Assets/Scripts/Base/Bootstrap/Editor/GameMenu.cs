@@ -6,7 +6,6 @@ using UnityEditor.SceneManagement;
 using UnityEngine;
 using Utils;
 
-//TODO: Add clearing saved player data and game data
 public class GameMenu
 {
     private const string MainGamePath = "Game/";
@@ -34,9 +33,22 @@ public class GameMenu
         PlayerPrefs.Save();
     }
         
-    [MenuItem(MainGamePath + "🎮 Run Game")]
+    [MenuItem(MainGamePath + "🎮 Run Local Game")]
     public static void RunGame()
     {
+        RunTheGame();
+    }
+
+    [MenuItem(MainGamePath + "Run Server")]
+    public static void RunServer()
+    {
+        
+    }
+
+    [MenuItem(MainGamePath + "🎮Run Client")]
+    public static void RunClient()
+    {
+        
         RunTheGame();
     }
     

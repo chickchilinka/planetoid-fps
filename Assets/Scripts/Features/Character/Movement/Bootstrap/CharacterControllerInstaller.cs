@@ -1,6 +1,7 @@
 using Base.RigidbodyMovement;
 using Base.RigidbodyMovement.Data;
 using Base.SurfaceGravity.View;
+using Features.Character.Movement.Adapter;
 using Features.Character.Movement.Provider;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -13,7 +14,9 @@ namespace Features.Character.Movement.Bootstrap
         [SerializeField] 
         private MovementSettings _movementSettings;
         [SerializeField]
-        private GravityBodyView _characterBodyView;
+        private LocalRigidbodyAdapter _characterRigidbody;
+        [SerializeField]
+        private GravityBodyView _characterGravityBody;
         [SerializeField]
         private Transform _cameraRoot;
         public override void InstallBindings()
@@ -22,13 +25,13 @@ namespace Features.Character.Movement.Bootstrap
             Container.BindInterfacesAndSelfTo<RigidbodyMovementController>().AsSingle().OnInstantiated((_, obj) =>
             {
                 var controller = obj as RigidbodyMovementController;
-                controller!.SetRigidBody(_characterBodyView.Rigidbody);
+                controller!.SetRigidBody(_characterRigidbody);
             });
             Container.BindInterfacesAndSelfTo<MovementInputProvider>().AsSingle();
             Container.BindInterfacesAndSelfTo<MovementDirectionProvider>().AsSingle().OnInstantiated((_, obj) =>
             {
                 var provider = obj as MovementDirectionProvider;
-                provider!.Initialize(_characterBodyView.Id, _cameraRoot);
+                provider!.Initialize(_characterGravityBody.Id, _cameraRoot);
             });
         }
     }
