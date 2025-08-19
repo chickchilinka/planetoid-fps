@@ -21,7 +21,6 @@ namespace Bootstrap
             Container.Install<SceneInstaller>();
             Container.Install<AppModeInstaller>();
             Container.Install<EffectsInstaller>();
-            Container.InstallAsSingle<GameController>();
         }
     }
 }

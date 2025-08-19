@@ -13,8 +13,7 @@ namespace Base.SurfaceGravity.View
         [SerializeField] private bool _lerpUpToNormal;
         public bool LerpUpToNormal => _lerpUpToNormal;
         public string Id { get; } = Guid.NewGuid().ToString();
-
-        public Rigidbody Rigidbody => _rigidbody ??= GetComponent<Rigidbody>();
+        public Quaternion Rotation => _rigidbody.rotation;
 
         private Rigidbody _rigidbody;
 
@@ -40,6 +39,16 @@ namespace Base.SurfaceGravity.View
         private void OnDestroy()
         {
             _gravityManagementService.UnregisterBody(this);
+        }
+
+        public void AddForce(Vector3 force, ForceMode forceMode)
+        {
+            _rigidbody.AddForce(force, forceMode);
+        }
+
+        internal void MoveRotation(Quaternion rotation)
+        {
+            _rigidbody.MoveRotation(rotation);
         }
     }
 }

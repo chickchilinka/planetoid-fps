@@ -5,17 +5,17 @@ using Zenject;
 
 namespace General
 {
-    public class GameController : IInitializable
+    public class GameController : MonoBehaviour
     {
-        private readonly IAppMode _appMode;
+        private IAppMode _appMode;
 
-        public GameController(
-            IAppMode appMode)
+        [Inject]
+        public void Construct(IAppMode appMode)
         {
             _appMode = appMode;
         }
 
-        public void Initialize()
+        private void Awake()
         {
             Application.targetFrameRate = Screen.currentResolution.refreshRate;
             _appMode.Apply();

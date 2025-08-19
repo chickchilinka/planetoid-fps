@@ -64,7 +64,7 @@ namespace Base.SurfaceGravity.Services
                     }
                 }
 
-                body.Rigidbody.AddForce(
+                body.AddForce(
                     -normal * _gravitySettings.GravityAcceleration,
                     ForceMode.Acceleration
                 );
@@ -81,11 +81,11 @@ namespace Base.SurfaceGravity.Services
                 var target = Quaternion.FromToRotation(
                     body.transform.up,
                     model.SmoothNormal
-                ) * body.Rigidbody.rotation;
+                ) * body.Rotation;
 
-                body.Rigidbody.MoveRotation(
+                body.MoveRotation(
                     Quaternion.RotateTowards(
-                        body.Rigidbody.rotation,
+                        body.Rotation,
                         target,
                         _gravitySettings.MaxRotateDeg
                     )
