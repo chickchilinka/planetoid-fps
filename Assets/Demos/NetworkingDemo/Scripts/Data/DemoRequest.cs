@@ -4,9 +4,9 @@ using MessagePack;
 namespace Demos.NetworkingDemo.Scripts
 {
     [MessagePackObject]
-    public struct DemoMessage: IMessagePayload
+    public struct DemoRequest: IMessagePayload
     {
         [Key(0)]
-        public string Message { get; set; }
+        public int Value { get; set; }
     }
 }

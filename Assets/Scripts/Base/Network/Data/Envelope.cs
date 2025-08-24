@@ -5,6 +5,7 @@ namespace Base.Network.Data
     public struct Envelope
     {
         public MessageId Id;
+        public MessageId ReplyTo; 
         public ushort Type;
         public uint ServerTick;
         public uint ClientTick;

@@ -28,14 +28,16 @@ namespace Base.Network.Bootstrap
 
         private void InstallClient(DiContainer container)
         {
-            container.Bind<ClientMessenger>().AsSingle();
+            container.BindInterfacesAndSelfTo<ClientMessenger>().AsSingle();
             container.BindInterfacesAndSelfTo<ClientMessageRouter>().AsSingle();
+            container.BindInterfacesAndSelfTo<ClientRequestRouter>().AsSingle();
             container.BindInterfacesAndSelfTo<RouteMessagesFromServerRule>().AsSingle();
         }
 
         private void InstallServer(DiContainer container)
         {
             container.Bind<ServerMessenger>().AsSingle();
+            container.BindInterfacesAndSelfTo<ConnectionRequestRouter>().AsSingle();
             container.BindInterfacesAndSelfTo<ConnectionMessageRouter>().AsSingle();
             container.BindInterfacesAndSelfTo<RouteMessagesFromClientsRule>().AsSingle();
         }

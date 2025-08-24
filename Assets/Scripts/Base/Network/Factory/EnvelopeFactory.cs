@@ -27,6 +27,7 @@ namespace Base.Network.Factory
             return new Envelope
             {
                 Id = _ids.Next(),
+                ReplyTo = default,
                 Type = id,
                 ServerTick = _ticks.ServerTick,
                 ClientTick = _ticks.ClientTick,
@@ -34,6 +35,14 @@ namespace Base.Network.Factory
                 Payload = _ser.Serialize(payload),
                 Reliability = rel
             };
+        }
+        
+        public Envelope CreateReply<T>(in T payload, ConnectionId src, MessageId replyTo, Reliability? qos=null)
+            where T: struct, IMessagePayload
+        {
+            var e = Create(payload, src, qos);
+            e.ReplyTo = replyTo;
+            return e;
         }
     }
 }

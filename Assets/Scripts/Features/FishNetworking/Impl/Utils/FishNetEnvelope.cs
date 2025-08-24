@@ -12,6 +12,7 @@ namespace Features.FishNetworking.Impl.Utils
             => new RawEnvelope
             {
                 Id = env.Id.Value,
+                ReplyTo = env.ReplyTo.Value,
                 Type = env.Type,
                 ServerTick = env.ServerTick,
                 ClientTick = env.ClientTick,
@@ -22,6 +23,7 @@ namespace Features.FishNetworking.Impl.Utils
             => new()
             {
                 Id = new MessageId(raw.Id),
+                ReplyTo = new MessageId(raw.ReplyTo),
                 Type = raw.Type,
                 ServerTick = raw.ServerTick,
                 ClientTick = raw.ClientTick,

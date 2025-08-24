@@ -8,14 +8,14 @@ using Zenject;
 
 namespace Demos.NetworkingDemo.Scripts.Rule
 {
-    public class ConnectAndMessageRule: IInitializable, IDisposable
+    public class ConnectAndMessageRule : IInitializable, IDisposable
     {
         private readonly INetworkClient _networkClient;
         private readonly ClientMessenger _clientMessenger;
 
-        public ConnectAndMessageRule(INetworkClient networkClient,ClientMessenger clientMessenger)
+        public ConnectAndMessageRule(INetworkClient networkClient, ClientMessenger clientMessenger)
         {
-            _networkClient = networkClient; 
+            _networkClient = networkClient;
             _clientMessenger = clientMessenger;
         }
 
@@ -36,6 +36,13 @@ namespace Demos.NetworkingDemo.Scripts.Rule
                 {
                     Message = "Hi, sending first message"
                 });
+
+                var response = await _clientMessenger.Request<DemoRequest, DemoRequest>(new DemoRequest()
+                {
+                    Value = 10
+                }, TimeSpan.FromSeconds(10));
+                
+                Debug.Log($"Server response is {response.Value}");
             }
             catch (Exception e)
             {

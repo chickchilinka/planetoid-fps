@@ -15,13 +15,13 @@ namespace Base.Network.Utils
                 .FromInstance(new HandlerRegistration(
                     register: () =>
                     {
-                        var h = container.Resolve<THandler>();
-                        container.Resolve<ClientMessageRouter>().Register(h);
+                        var handler = container.Resolve<THandler>();
+                        container.Resolve<ClientMessageRouter>().Register(handler);
                     },
                     unregister: () =>
                     {
-                        var h = container.Resolve<THandler>();
-                        container.Resolve<ClientMessageRouter>().Unregister(h);
+                        var handler = container.Resolve<THandler>();
+                        container.Resolve<ClientMessageRouter>().Unregister(handler);
                     }
                 )).AsCached();
         }
@@ -34,13 +34,13 @@ namespace Base.Network.Utils
                 .FromInstance(new HandlerRegistration(
                     register: () =>
                     {
-                        var h = container.Resolve<THandler>();
-                        container.Resolve<ConnectionMessageRouter>().Register(h);
+                        var handler = container.Resolve<THandler>();
+                        container.Resolve<ConnectionMessageRouter>().Register(handler);
                     },
                     unregister: () =>
                     {
-                        var h = container.Resolve<THandler>();
-                        container.Resolve<ConnectionMessageRouter>().Unregister(h);
+                        var handler = container.Resolve<THandler>();
+                        container.Resolve<ConnectionMessageRouter>().Unregister(handler);
                     }
                 )).AsCached();
         }
@@ -62,8 +62,8 @@ namespace Base.Network.Utils
                 .FromInstance(new HandlerRegistration(
                     register: () =>
                     {
-                        var h = container.Resolve<THandler>();
-                        container.Resolve<ClientMessageRouter>().Register(h);
+                        var handler = container.Resolve<THandler>();
+                        container.Resolve<ClientMessageRouter>().Register(handler);
                     },
                     unregister: () =>
                     {
@@ -80,8 +80,8 @@ namespace Base.Network.Utils
                 .FromInstance(new HandlerRegistration(
                     register: () =>
                     {
-                        var h = container.Resolve<THandler>();
-                        container.Resolve<ConnectionMessageRouter>().Register(h);
+                        var handler = container.Resolve<THandler>();
+                        container.Resolve<ConnectionMessageRouter>().Register(handler);
                     },
                     unregister: () => { }
                 )).AsCached();
@@ -95,6 +95,44 @@ namespace Base.Network.Utils
                 .FromInstance(new MessageTypeRegistration
                     { MessageType = typeof(TMessage), TypeId = id, DefaultReliability = reliability })
                 .AsCached();
+        }
+        
+        public static void RegisterConnectionRequestHandler<THandler,TReq,TRes>(this DiContainer container)
+            where THandler : IConnectionRequestHandler<TReq,TRes>
+            where TReq : struct, IMessagePayload
+            where TRes : struct, IMessagePayload
+        {
+            container.BindInterfacesAndSelfTo<THandler>().AsSingle();
+            container.Bind<HandlerRegistration>().WithId(NetScopes.Scene)
+                .FromInstance(new HandlerRegistration(
+                    register: () => {
+                        var handler = container.Resolve<THandler>();
+                        container.Resolve<ConnectionRequestRouter>().Register(handler);
+                    },
+                    unregister: () => {
+                        var handler = container.Resolve<THandler>();
+                        container.Resolve<ConnectionRequestRouter>().Unregister(handler);
+                    }
+                )).AsCached();
+        }
+        
+        public static void RegisterClientRequestHandler<THandler,TReq,TRes>(this DiContainer container)
+            where THandler : IClientRequestHandler<TReq,TRes>
+            where TReq : struct, IMessagePayload
+            where TRes : struct, IMessagePayload
+        {
+            container.BindInterfacesAndSelfTo<THandler>().AsSingle();
+            container.Bind<HandlerRegistration>().WithId(NetScopes.Scene)
+                .FromInstance(new HandlerRegistration(
+                    register: () => {
+                        var handler = container.Resolve<THandler>();
+                        container.Resolve<ClientRequestRouter>().Register(handler);
+                    },
+                    unregister: () => {
+                        var handler = container.Resolve<THandler>();
+                        container.Resolve<ClientRequestRouter>().Unregister(handler);
+                    }
+                )).AsCached();
         }
     }
 }
