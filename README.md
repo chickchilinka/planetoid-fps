@@ -14,6 +14,7 @@ A small Unity project demonstrating custom surface gravity, 3rd‑person movemen
     - Bootstrap & loading flow
     - Window system
     - DI via Zenject, reactive programming via UniRx
+    - Module with the basis of client-server interaction and implementation in Fishnet. See demo for basic client-server message exchange and RPC in `Demos/NetworkingDemo`.
 
 ## 🚀 Getting Started
 
@@ -27,13 +28,13 @@ A small Unity project demonstrating custom surface gravity, 3rd‑person movemen
 - Zenject
 - UniRx
 - Addressables (in future)
-- Mirror Networking or FishNet for multiplayer (in future)
+- FishNet
 
 ## 📈 Main Goals Roadmap
 
+- [ ] Networked multiplayer with authoritative server
 - [ ] Player spawn system
 - [ ] Damage and Weapon systems, HUD
-- [ ] Networked multiplayer with authoritative server
 - [ ] Backend for authentication, player profiles, lobbies
 - [ ] Character & weapon animations
 - [ ] UI, Settings
