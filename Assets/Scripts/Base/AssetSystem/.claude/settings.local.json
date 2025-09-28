@@ -1,0 +1,34 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(/C:\\Users\\almaz\\RiderProjects\\quivar-app\\Assets\\Scripts\\Modules\\AssetSystem\\Services/**)",
+      "Read(/C:\\Users\\almaz\\RiderProjects\\quivar-app\\Assets\\Scripts\\Modules\\AssetSystem\\Models/**)",
+      "Read(/C:\\Users\\almaz\\RiderProjects\\quivar-app\\Assets\\Scripts\\Modules\\AssetSystem\\Storage/**)",
+      "Read(/C:\\Users\\almaz\\RiderProjects\\quivar-app\\Assets\\Scripts\\Modules\\AssetSystem\\Providers/**)",
+      "Read(/C:\\Users\\almaz\\RiderProjects\\quivar-app\\Assets\\Scripts\\Features\\AssetSystemImpl/**)",
+      "Read(/C:\\Users\\almaz\\RiderProjects\\quivar-app\\Assets\\Scripts\\Features\\AssetSystemImpl/**)",
+      "Read(/C:\\Users\\almaz\\RiderProjects\\quivar-app\\Assets\\Scripts\\Modules\\AssetSystem\\Providers/**)",
+      "Read(/C:\\Users\\almaz\\RiderProjects\\quivar-app\\Assets\\Scripts\\Modules\\AssetSystem\\Services/**)",
+      "Read(/C:\\Users\\almaz\\RiderProjects\\quivar-app\\Assets\\Scripts\\Features\\AssetSystemImpl/**)",
+      "Read(/C:\\Users\\almaz\\RiderProjects\\quivar-app\\Assets\\Scripts\\Features\\AssetSystemImpl\\Editor/**)",
+      "Read(/C:\\Users\\almaz\\RiderProjects\\quivar-app\\Assets\\Scripts\\Features\\AssetSystemImpl\\Bootstrap/**)",
+      "Read(/C:\\Users\\almaz\\RiderProjects\\quivar-app\\Assets\\Scripts\\Features\\AssetSystemImpl\\Providers/**)",
+      "Read(/C:\\Users\\almaz\\RiderProjects\\quivar-app\\Assets\\Scripts\\Features\\AssetSystemImpl\\Attributes/**)",
+      "Read(/C:\\Users\\almaz\\RiderProjects\\quivar-app\\Assets\\Scripts\\Features\\AssetSystemImpl\\Editor\\Data/**)",
+      "Read(/C:\\Users\\almaz\\RiderProjects\\quivar-app\\Assets\\Scripts\\Features\\AssetSystemImpl\\Editor\\Providers/**)",
+      "Read(/C:\\Users\\almaz\\RiderProjects\\quivar-app\\Assets\\Scripts\\Features\\AssetSystemImpl\\Editor\\Providers/**)",
+      "Read(/C:\\Users\\almaz\\RiderProjects\\quivar-app\\Assets\\Scripts\\Features\\AssetSystemImpl\\Editor\\Storage/**)",
+      "Read(/C:\\Users\\almaz\\RiderProjects\\quivar-app\\Assets\\Scripts\\Features\\AssetSystemImpl\\Editor\\View/**)",
+      "Read(/C:\\Users\\almaz\\RiderProjects\\quivar-app\\Assets\\Scripts\\Features\\AssetSystemImpl\\Editor\\View/**)",
+      "Read(/C:\\Users\\almaz\\RiderProjects\\quivar-app\\Assets\\Scripts\\Features\\AssetSystemImpl/**)",
+      "Read(/C:\\Users\\almaz\\RiderProjects\\quivar-app\\Assets\\Scripts\\Features\\AssetSystemImpl/**)",
+      "Read(/C:\\Users\\almaz\\RiderProjects\\quivar-app\\Assets\\Scripts\\Modules\\AssetSystem\\Models/**)",
+      "Read(/C:\\Users\\almaz\\RiderProjects\\quivar-app\\Assets\\Scripts\\Modules\\AssetSystem\\Storage/**)",
+      "Read(/C:\\Users\\almaz\\RiderProjects\\quivar-app\\Assets\\Scripts\\Modules\\AssetSystem/**)",
+      "Read(/C:\\Users\\almaz\\RiderProjects\\quivar-app\\Assets\\Scripts\\Features\\AssetSystemImpl/**)",
+      "Read(/C:\\Users\\almaz\\RiderProjects\\quivar-app\\Assets\\Scripts\\Modules\\AssetSystem\\Editor\\Tests/**)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

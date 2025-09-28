@@ -8,10 +8,6 @@ namespace ApplicationMode.Types
         {
             return new []
             {
-                Factory.Resolve<StartSessionState>(),
-
-                // Factory.Resolve<DownloadActualAddressablesState>(),
-                
                 Factory.Resolve<LoadTestSceneState>()
             };
         }

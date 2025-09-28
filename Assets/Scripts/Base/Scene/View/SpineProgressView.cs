@@ -44,7 +44,7 @@ namespace Scene.View
         {
             _tween?.Kill();
 
-            if (newProgress == _newProgress && _tween != null && _tween.IsPlaying())
+            if (Mathf.Approximately(newProgress, _newProgress) && _tween != null && _tween.IsPlaying())
                 return;
 
             _tween = DOTween.To(value => _track.TrackTime = value, _track.TrackTime, newProgress * _animDuration, duration);

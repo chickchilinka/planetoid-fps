@@ -13,20 +13,10 @@ namespace ApplicationMode
         {
             InstallAppMode();
             
-            Container.InstallAsSingle<DownloadActualAddressablesState>();
-            Container.InstallAsSingle<DownloadAllAddressablesState>();
-            Container.InstallAsSingle<LoadMapSceneState>();
+            Container.InstallAsSingle<LoadMenuSceneState>();
             Container.InstallAsSingle<ShowInitialWindowState>();
             Container.InstallAsSingle<LoadTestSceneState>();
-            Container.InstallAsSingle<StartSessionState>();
             Container.InstallAsSingle<AppModeFactory>();
-
-            Container.DeclareSignal<GeneralAppSignals.SessionStarted>();
-            Container.DeclareSignal<GeneralAppSignals.AppFocusChanged>();
-            Container.DeclareSignal<GeneralAppSignals.ApplicationQuit>();
-            Container.DeclareSignal<GeneralAppSignals.ChangeLoadingText>();
-            Container.DeclareSignal<GeneralAppSignals.PlayGameRequest>();
-            Container.DeclareSignal<GeneralAppSignals.RestartGameRequest>();
         }
         
         private void InstallAppMode()

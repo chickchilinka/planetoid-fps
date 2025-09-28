@@ -33,8 +33,7 @@ namespace Scene.Rules
 
         private void ShowTransition()
         {
-            _viewService.ShowView<TransitionWindow, TransitionWindow.Data>(new TransitionWindow.Data()
-                { });
+            _viewService.ShowView<TransitionWindow, TransitionWindow.Data>(new TransitionWindow.Data());
         }
     }
 }

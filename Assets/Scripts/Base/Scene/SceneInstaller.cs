@@ -9,7 +9,7 @@ namespace Scene
     {
         public override void InstallBindings()
         {
-            Container.Bind<ISceneLoader>().To<SceneLoader>().AsSingle();
+            Container.BindInterfacesAndSelfTo<SceneLoader>().AsSingle();
 
             Container.InstallAsSingle<ShowLoaderRule>();
         }

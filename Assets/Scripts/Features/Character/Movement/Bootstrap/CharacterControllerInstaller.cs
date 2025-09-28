@@ -4,7 +4,6 @@ using Base.SurfaceGravity.View;
 using Features.Character.Movement.Adapter;
 using Features.Character.Movement.Provider;
 using UnityEngine;
-using UnityEngine.Serialization;
 using Zenject;
 
 namespace Features.Character.Movement.Bootstrap
