@@ -30,6 +30,36 @@ A small Unity project demonstrating custom surface gravity, 3rd‑person movemen
 - Addressables (in future)
 - FishNet
 
+## 🏗 Architecture Overview
+
+The project follows a modular, layered architecture focused on scalability, replaceability, and clear separation of responsibilities.
+
+### Base Layer
+
+`Base` contains isolated, reusable core modules and abstractions that are independent from concrete gameplay implementations.  
+This layer defines:
+
+- Core domain contracts and service interfaces
+- Infrastructure primitives (lifecycle, messaging, composition helpers)
+- Extension points for feature implementations
+- Reactive and async orchestration
+
+Base modules do not reference any concrete gameplay or SDK-specific code.  
+They form a stable foundation that can be reused across different projects or replaced incrementally.
+
+### Features Layer
+
+`Features` contains concrete implementations of the extension points defined in `Base`.
+
+This includes:
+
+- Gameplay systems and integrations
+- SDK adapters and infrastructure bindings
+- Composition roots and dependency wiring
+- UI and presentation logic
+
+Features can evolve independently without impacting the core architecture.
+
 ## 📈 Main Goals Roadmap
 
 - [ ] Networked multiplayer with authoritative server
