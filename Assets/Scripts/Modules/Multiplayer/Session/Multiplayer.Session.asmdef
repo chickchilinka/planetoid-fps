@@ -1,0 +1,17 @@
+{
+    "name": "Multiplayer.Session",
+    "rootNamespace": "Modules.Multiplayer.Session",
+    "references": [
+        "Multiplayer.Primitives",
+        "Zenject"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

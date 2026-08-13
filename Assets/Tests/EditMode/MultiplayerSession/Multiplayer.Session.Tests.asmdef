@@ -1,0 +1,22 @@
+{
+    "name": "Multiplayer.Session.Tests",
+    "rootNamespace": "Modules.Multiplayer.Session.Tests",
+    "references": [
+        "Multiplayer.Session",
+        "Multiplayer.Primitives"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false,
+    "optionalUnityReferences": [
+        "TestAssemblies"
+    ]
+}
