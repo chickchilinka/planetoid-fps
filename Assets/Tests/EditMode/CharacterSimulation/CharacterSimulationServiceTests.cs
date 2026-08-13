@@ -172,6 +172,114 @@ namespace Modules.Character.Simulation.Tests
         }
 
         [Test]
+        public void Simulate_GravityUpCrossesOldWorldBasisThreshold_HeadingRemainsContinuous()
+        {
+            var belowThresholdUp = UnitVectorWithForwardComponent(0.989f);
+            var aboveThresholdUp = UnitVectorWithForwardComponent(0.991f);
+            var below = Service(new FakeCharacterGravityProvider(
+                    -belowThresholdUp * 9.81f,
+                    belowThresholdUp,
+                    new GravityState(new SurfaceId("planet"), belowThresholdUp)))
+                .Simulate(
+                    new CharacterInput(Vector2.up, 0f, false, false),
+                    Body(grounded: true),
+                    CharacterSimulationState.Initial,
+                    0.02f);
+            var above = Service(new FakeCharacterGravityProvider(
+                    -aboveThresholdUp * 9.81f,
+                    aboveThresholdUp,
+                    new GravityState(new SurfaceId("planet"), aboveThresholdUp)))
+                .Simulate(
+                    new CharacterInput(Vector2.up, 0f, false, false),
+                    Body(grounded: true),
+                    CharacterSimulationState.Initial,
+                    0.02f);
+
+            Assert.That(
+                Vector3.Angle(below.LinearVelocity, above.LinearVelocity),
+                Is.LessThan(2f));
+            Assert.That(
+                Quaternion.Angle(below.TargetRotation, above.TargetRotation),
+                Is.LessThan(2f));
+        }
+
+        [Test]
+        public void Simulate_ViewYawCrossesWrap_AppliesShortestReplayableDelta()
+        {
+            var state = new CharacterSimulationState(
+                GravityState.Empty,
+                JumpPhase.None,
+                0f,
+                179f);
+
+            var result = Service().Simulate(
+                new CharacterInput(Vector2.up, -179f, false, false),
+                Body(grounded: true),
+                state,
+                0.02f);
+            var expectedForward = Quaternion.AngleAxis(2f, Vector3.up) * Vector3.forward;
+
+            Assert.That(
+                result.TargetRotation * Vector3.forward,
+                Is.EqualTo(expectedForward).Using(VectorComparer));
+            Assert.That(
+                result.LinearVelocity,
+                Is.EqualTo(expectedForward * 6f).Using(VectorComparer));
+            Assert.That(result.State.ViewYaw, Is.EqualTo(-179f));
+        }
+
+        [Test]
+        public void Simulate_PhysicalRotationLagsDesiredHeading_UnchangedYawKeepsDesiredTarget()
+        {
+            var first = Service().Simulate(
+                new CharacterInput(Vector2.up, 90f, false, false),
+                Body(grounded: true),
+                CharacterSimulationState.Initial,
+                0.02f);
+            var physicalRotationAfterClamp = Quaternion.AngleAxis(45f, Vector3.up);
+            var laggingBody = new CharacterBodySnapshot(
+                Vector3.zero,
+                physicalRotationAfterClamp,
+                first.LinearVelocity,
+                true,
+                Vector3.up);
+
+            var second = Service().Simulate(
+                new CharacterInput(Vector2.up, 90f, false, false),
+                laggingBody,
+                first.State,
+                0.02f);
+
+            Assert.That(
+                first.TargetRotation * Vector3.forward,
+                Is.EqualTo(Vector3.right).Using(VectorComparer));
+            Assert.That(
+                second.TargetRotation * Vector3.forward,
+                Is.EqualTo(Vector3.right).Using(VectorComparer));
+            Assert.That(second.State.HeadingForward, Is.EqualTo(Vector3.right).Using(VectorComparer));
+        }
+
+        [Test]
+        public void Simulate_BodyForwardExactlyMatchesGravityUp_UsesBodyRightFallback()
+        {
+            var gravityUp = Vector3.forward;
+            var provider = new FakeCharacterGravityProvider(
+                -gravityUp * 9.81f,
+                gravityUp,
+                new GravityState(new SurfaceId("planet"), gravityUp));
+
+            var result = Service(provider).Simulate(
+                new CharacterInput(Vector2.up, 0f, false, false),
+                Body(grounded: true),
+                CharacterSimulationState.Initial,
+                0.02f);
+
+            Assert.That(result.LinearVelocity, Is.EqualTo(Vector3.down * 6f).Using(VectorComparer));
+            Assert.That(result.TargetRotation * Vector3.forward, Is.EqualTo(Vector3.down).Using(VectorComparer));
+            Assert.That(result.TargetRotation * Vector3.up, Is.EqualTo(gravityUp).Using(VectorComparer));
+        }
+
+        [Test]
         public void Simulate_ForwardsExactReplayableGravityQuery_AndStoresReturnedState()
         {
             var bodyRotation = Quaternion.AngleAxis(90f, Vector3.forward);
@@ -312,6 +420,14 @@ namespace Modules.Character.Simulation.Tests
                 velocity ?? Vector3.zero,
                 grounded,
                 bodyUp);
+        }
+
+        private static Vector3 UnitVectorWithForwardComponent(float forwardComponent)
+        {
+            return new Vector3(
+                Mathf.Sqrt(1f - forwardComponent * forwardComponent),
+                0f,
+                forwardComponent);
         }
 
         private static IReadOnlyList<CharacterStepResult> RunSequence(IEnumerable<CharacterInput> inputs)

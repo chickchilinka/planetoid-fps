@@ -36,7 +36,14 @@ namespace Modules.Character.Simulation
             ValidateGravityResult(gravity);
 
             var up = gravity.TargetUp.normalized;
-            BuildMovementBasis(up, input.ViewYaw, out var forward, out var right);
+            BuildMovementBasis(
+                body.Rotation,
+                up,
+                state.HeadingForward,
+                state.ViewYaw,
+                input.ViewYaw,
+                out var forward,
+                out var right);
 
             var move = Vector2.ClampMagnitude(input.Move, 1f);
             var desiredTangentVelocity =
@@ -61,7 +68,8 @@ namespace Modules.Character.Simulation
                 gravity.State,
                 nextState.JumpPhase,
                 nextState.JumpElapsed,
-                input.ViewYaw);
+                input.ViewYaw,
+                forward);
 
             return new CharacterStepResult(
                 tangentVelocity + verticalVelocity,
@@ -128,17 +136,49 @@ namespace Modules.Character.Simulation
         }
 
         private static void BuildMovementBasis(
+            Quaternion bodyRotation,
             Vector3 up,
-            float viewYaw,
+            Vector3 previousHeadingForward,
+            float previousViewYaw,
+            float currentViewYaw,
             out Vector3 forward,
             out Vector3 right)
         {
-            var referenceAxis = Mathf.Abs(Vector3.Dot(up, Vector3.forward)) < 0.99f
-                ? Vector3.forward
-                : Vector3.right;
-            var referenceForward = Vector3.ProjectOnPlane(referenceAxis, up).normalized;
-            forward = (Quaternion.AngleAxis(viewYaw, up) * referenceForward).normalized;
+            var priorForward = Vector3.ProjectOnPlane(previousHeadingForward, up);
+            if (priorForward.sqrMagnitude <= DirectionEpsilon)
+            {
+                priorForward = Vector3.ProjectOnPlane(
+                    bodyRotation * Vector3.forward,
+                    up);
+                if (priorForward.sqrMagnitude <= DirectionEpsilon)
+                {
+                    var priorRight = Vector3.ProjectOnPlane(
+                        bodyRotation * Vector3.right,
+                        up);
+                    priorForward = priorRight.sqrMagnitude > DirectionEpsilon
+                        ? Vector3.Cross(priorRight.normalized, up)
+                        : DeterministicTangent(up);
+                }
+            }
+
+            priorForward.Normalize();
+            var yawDelta = Mathf.DeltaAngle(previousViewYaw, currentViewYaw);
+            forward = Quaternion.AngleAxis(yawDelta, up) * priorForward;
+            forward = Vector3.ProjectOnPlane(forward, up).normalized;
             right = Vector3.Cross(up, forward).normalized;
+        }
+
+        private static Vector3 DeterministicTangent(Vector3 up)
+        {
+            var absoluteX = Mathf.Abs(up.x);
+            var absoluteY = Mathf.Abs(up.y);
+            var absoluteZ = Mathf.Abs(up.z);
+            var leastAlignedAxis = absoluteX <= absoluteY && absoluteX <= absoluteZ
+                ? Vector3.right
+                : absoluteY <= absoluteZ
+                    ? Vector3.up
+                    : Vector3.forward;
+            return Vector3.ProjectOnPlane(leastAlignedAxis, up).normalized;
         }
 
         private static void Validate(
@@ -171,6 +211,7 @@ namespace Modules.Character.Simulation
                 !IsFinite(state.JumpElapsed) ||
                 state.JumpElapsed < 0f ||
                 !IsFinite(state.ViewYaw) ||
+                !IsFinite(state.HeadingForward) ||
                 !IsFinite(state.Gravity.SmoothedUp) ||
                 state.Gravity.SmoothedUp.sqrMagnitude <= DirectionEpsilon)
             {

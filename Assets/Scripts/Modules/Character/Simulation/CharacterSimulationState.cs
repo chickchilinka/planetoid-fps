@@ -1,5 +1,6 @@
 using System;
 using Modules.SurfaceGravity.Core;
+using UnityEngine;
 
 namespace Modules.Character.Simulation
 {
@@ -15,18 +16,30 @@ namespace Modules.Character.Simulation
             GravityState.Empty,
             JumpPhase.None,
             0f,
-            0f);
+            0f,
+            Vector3.zero);
 
         public CharacterSimulationState(
             GravityState gravity,
             JumpPhase jumpPhase,
             float jumpElapsed,
             float viewYaw)
+            : this(gravity, jumpPhase, jumpElapsed, viewYaw, Vector3.zero)
+        {
+        }
+
+        public CharacterSimulationState(
+            GravityState gravity,
+            JumpPhase jumpPhase,
+            float jumpElapsed,
+            float viewYaw,
+            Vector3 headingForward)
         {
             Gravity = gravity;
             JumpPhase = jumpPhase;
             JumpElapsed = jumpElapsed;
             ViewYaw = viewYaw;
+            HeadingForward = headingForward;
         }
 
         public GravityState Gravity { get; }
@@ -37,9 +50,16 @@ namespace Modules.Character.Simulation
 
         public float ViewYaw { get; }
 
+        public Vector3 HeadingForward { get; }
+
         public CharacterSimulationState WithGravity(GravityState gravity)
         {
-            return new CharacterSimulationState(gravity, JumpPhase, JumpElapsed, ViewYaw);
+            return new CharacterSimulationState(
+                gravity,
+                JumpPhase,
+                JumpElapsed,
+                ViewYaw,
+                HeadingForward);
         }
 
         public bool Equals(CharacterSimulationState other)
@@ -47,7 +67,8 @@ namespace Modules.Character.Simulation
             return Gravity.Equals(other.Gravity) &&
                    JumpPhase == other.JumpPhase &&
                    JumpElapsed.Equals(other.JumpElapsed) &&
-                   ViewYaw.Equals(other.ViewYaw);
+                   ViewYaw.Equals(other.ViewYaw) &&
+                   HeadingForward.Equals(other.HeadingForward);
         }
 
         public override bool Equals(object obj)
@@ -63,6 +84,7 @@ namespace Modules.Character.Simulation
                 hashCode = (hashCode * 397) ^ (int)JumpPhase;
                 hashCode = (hashCode * 397) ^ JumpElapsed.GetHashCode();
                 hashCode = (hashCode * 397) ^ ViewYaw.GetHashCode();
+                hashCode = (hashCode * 397) ^ HeadingForward.GetHashCode();
                 return hashCode;
             }
         }
