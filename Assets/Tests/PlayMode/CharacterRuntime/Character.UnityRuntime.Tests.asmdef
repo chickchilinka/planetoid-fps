@@ -1,0 +1,21 @@
+{
+    "name": "Character.UnityRuntime.Tests",
+    "rootNamespace": "Modules.Character.UnityRuntime.Tests",
+    "references": [
+        "Character.UnityRuntime",
+        "Character.Simulation",
+        "SurfaceGravity.Core"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false,
+    "optionalUnityReferences": [
+        "TestAssemblies"
+    ]
+}
