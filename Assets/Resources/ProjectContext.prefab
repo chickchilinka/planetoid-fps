@@ -164,7 +164,6 @@ GameObject:
   - component: {fileID: 1606484302602583851}
   - component: {fileID: 8346961195215333710}
   - component: {fileID: 8563610499228960524}
-  - component: {fileID: 5856993823175021661}
   m_Layer: 0
   m_Name: ProjectContext
   m_TagString: Untagged
@@ -248,29 +247,9 @@ MonoBehaviour:
   _assetPackSettingsRegistryReference:
     m_AssetGUID: deda4a28fe13ff0489ada23331bfd94b
     m_SubObjectName: 
-    m_SubObjectGUID: 
     m_SubObjectType: 
+    m_SubObjectGUID:
     m_EditorAssetChanged: 0
---- !u!114 &5856993823175021661
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4210962382543464299}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e2a21296699a4f9fbb628452a87857f2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _gravitySettings:
-    <SphereCastRadius>k__BackingField: 0.25
-    <MaxRotateDeg>k__BackingField: 10
-    <RayLength>k__BackingField: 2
-    <NormalLerpSpeed>k__BackingField: 4
-    <GravityAcceleration>k__BackingField: 9.81
-    <PlanetSearchRadius>k__BackingField: 300
-    <SurfaceGravityLayerName>k__BackingField: SurfaceGravity
 --- !u!1001 &7240943578250125518
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -62,8 +62,11 @@ namespace Base.ThirdPersonCamera
 
         private void UpdatePosition()
         {
-            _yawTransform.position = Vector3.MoveTowards(_yawTransform.position, _cameraTransformProvider.YawPivot,
-                Time.deltaTime * _settings.FollowSpeed);
+            var alpha = 1f - Mathf.Exp(-_settings.FollowSpeed * Time.deltaTime);
+            _yawTransform.position = Vector3.Lerp(
+                _yawTransform.position,
+                _cameraTransformProvider.YawPivot,
+                alpha);
         }
     }
 }
