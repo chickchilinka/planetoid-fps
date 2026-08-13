@@ -25,6 +25,74 @@ namespace Modules.Character.UnityRuntime.Tests
             yield return null;
         }
 
+        [Test]
+        public void PresentationAnchor_RejectsDescendantOfPhysicsRoot()
+        {
+            var physicsRoot = new GameObject("physics-root");
+            var anchorObject = new GameObject("presentation-anchor");
+            anchorObject.transform.SetParent(physicsRoot.transform, false);
+            anchorObject.SetActive(false);
+            var anchor = anchorObject.AddComponent<CharacterPresentationAnchor>();
+
+            try
+            {
+                var exception = Assert.Throws<System.InvalidOperationException>(
+                    () => anchor.Initialize(physicsRoot.transform));
+                StringAssert.Contains("must not be", exception.Message);
+            }
+            finally
+            {
+                Object.DestroyImmediate(anchorObject);
+                Object.DestroyImmediate(physicsRoot);
+            }
+        }
+
+        [UnityTest]
+        public IEnumerator PresentationAnchor_PreservesAuthoredRelativePose()
+        {
+            var physicsRoot = new GameObject("physics-root");
+            var anchorObject = new GameObject("presentation-anchor");
+            physicsRoot.transform.SetPositionAndRotation(
+                new Vector3(3f, 2f, 1f),
+                Quaternion.Euler(0f, 30f, 0f));
+            var authoredOffset = new Vector3(1f, 2f, -3f);
+            var authoredRotationOffset = Quaternion.Euler(10f, 20f, 30f);
+            anchorObject.transform.SetPositionAndRotation(
+                physicsRoot.transform.TransformPoint(authoredOffset),
+                physicsRoot.transform.rotation * authoredRotationOffset);
+            anchorObject.SetActive(false);
+            var anchor = anchorObject.AddComponent<CharacterPresentationAnchor>();
+            anchor.ConfigureForTests(physicsRoot.transform, 100000f, 100000f);
+
+            try
+            {
+                anchorObject.SetActive(true);
+                physicsRoot.transform.SetPositionAndRotation(
+                    new Vector3(-4f, 8f, 2f),
+                    Quaternion.Euler(35f, -40f, 15f));
+
+                yield return null;
+
+                Assert.That(
+                    Vector3.Distance(
+                        anchorObject.transform.position,
+                        physicsRoot.transform.TransformPoint(authoredOffset)),
+                    Is.LessThan(0.0001f));
+                Assert.That(
+                    Quaternion.Angle(
+                        anchorObject.transform.rotation,
+                        physicsRoot.transform.rotation * authoredRotationOffset),
+                    Is.LessThan(0.0001f));
+            }
+            finally
+            {
+                Object.Destroy(anchorObject);
+                Object.Destroy(physicsRoot);
+            }
+
+            yield return null;
+        }
+
         [UnityTest]
         public IEnumerator JumpPressedAndReleasedBetweenFixedTicks_RemainsBuffered()
         {
@@ -60,6 +128,9 @@ namespace Modules.Character.UnityRuntime.Tests
                 Assert.That(simulation.LastTickDelta, Is.EqualTo(Time.fixedDeltaTime));
                 Assert.That(rigidbody.useGravity, Is.False);
                 Assert.That(rigidbody.interpolation, Is.EqualTo(RigidbodyInterpolation.Interpolate));
+                Assert.That(
+                    rigidbody.constraints & RigidbodyConstraints.FreezeRotation,
+                    Is.EqualTo(RigidbodyConstraints.None));
             }
             finally
             {

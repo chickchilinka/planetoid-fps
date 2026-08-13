@@ -9,31 +9,59 @@ namespace Modules.Character.UnityRuntime
         [SerializeField, Min(0.001f)] private float _positionSharpness = 20f;
         [SerializeField, Min(0.001f)] private float _rotationSharpness = 20f;
 
+        private Vector3 _positionOffset;
+        private Quaternion _rotationOffset;
         private Vector3 _presentationPosition;
         private Quaternion _presentationRotation;
 
         private void Awake()
         {
-            if (_physicsRoot == null)
-                throw new InvalidOperationException("A physics root is required for presentation smoothing.");
-
-            _presentationPosition = transform.position;
-            _presentationRotation = transform.rotation;
+            Initialize(_physicsRoot);
         }
 
         private void LateUpdate()
         {
+            var targetPosition = _physicsRoot.TransformPoint(_positionOffset);
+            var targetRotation = _physicsRoot.rotation * _rotationOffset;
             var positionAlpha = 1f - Mathf.Exp(-_positionSharpness * Time.deltaTime);
             var rotationAlpha = 1f - Mathf.Exp(-_rotationSharpness * Time.deltaTime);
             _presentationPosition = Vector3.Lerp(
                 _presentationPosition,
-                _physicsRoot.position,
+                targetPosition,
                 positionAlpha);
             _presentationRotation = Quaternion.Slerp(
                 _presentationRotation,
-                _physicsRoot.rotation,
+                targetRotation,
                 rotationAlpha);
             transform.SetPositionAndRotation(_presentationPosition, _presentationRotation);
+        }
+
+        internal void ConfigureForTests(
+            Transform physicsRoot,
+            float positionSharpness = 20f,
+            float rotationSharpness = 20f)
+        {
+            _physicsRoot = physicsRoot;
+            _positionSharpness = positionSharpness;
+            _rotationSharpness = rotationSharpness;
+        }
+
+        internal void Initialize(Transform physicsRoot)
+        {
+            if (physicsRoot == null)
+                throw new InvalidOperationException("A physics root is required for presentation smoothing.");
+            if (transform == physicsRoot || transform.IsChildOf(physicsRoot))
+            {
+                throw new InvalidOperationException(
+                    "The presentation anchor must not be the physics root or its descendant. " +
+                    "Use an independent transform so physics corrections can be smoothed.");
+            }
+
+            _physicsRoot = physicsRoot;
+            _positionOffset = physicsRoot.InverseTransformPoint(transform.position);
+            _rotationOffset = Quaternion.Inverse(physicsRoot.rotation) * transform.rotation;
+            _presentationPosition = transform.position;
+            _presentationRotation = transform.rotation;
         }
     }
 }

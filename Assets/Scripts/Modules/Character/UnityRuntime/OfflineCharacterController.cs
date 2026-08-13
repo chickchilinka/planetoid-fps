@@ -33,7 +33,7 @@ namespace Modules.Character.UnityRuntime
             _rigidbody = GetComponent<Rigidbody>();
             _rigidbody.useGravity = false;
             _rigidbody.interpolation = RigidbodyInterpolation.Interpolate;
-            _rigidbody.constraints |= RigidbodyConstraints.FreezeRotation;
+            _rigidbody.constraints &= ~RigidbodyConstraints.FreezeRotation;
         }
 
         private void FixedUpdate()
@@ -67,6 +67,7 @@ namespace Modules.Character.UnityRuntime
         private void Apply(in CharacterStepResult result)
         {
             _rigidbody.linearVelocity = result.LinearVelocity;
+            _rigidbody.angularVelocity = Vector3.zero;
             _rigidbody.AddForce(result.Acceleration, ForceMode.Acceleration);
             _rigidbody.MoveRotation(Quaternion.RotateTowards(
                 _rigidbody.rotation,
