@@ -25,26 +25,51 @@ namespace Modules.Character.UnityRuntime.Tests
             yield return null;
         }
 
-        [Test]
-        public void PresentationAnchor_RejectsDescendantOfPhysicsRoot()
+        [UnityTest]
+        public IEnumerator PresentationAnchor_ChildSmoothsRootCorrectionAndPreservesOffset()
         {
             var physicsRoot = new GameObject("physics-root");
             var anchorObject = new GameObject("presentation-anchor");
+            var authoredOffset = new Vector3(1f, 2f, -3f);
+            var authoredRotationOffset = Quaternion.Euler(10f, 20f, 30f);
             anchorObject.transform.SetParent(physicsRoot.transform, false);
+            anchorObject.transform.SetLocalPositionAndRotation(
+                authoredOffset,
+                authoredRotationOffset);
             anchorObject.SetActive(false);
             var anchor = anchorObject.AddComponent<CharacterPresentationAnchor>();
+            anchor.ConfigureForTests(physicsRoot.transform, 1f, 1f);
 
             try
             {
-                var exception = Assert.Throws<System.InvalidOperationException>(
-                    () => anchor.Initialize(physicsRoot.transform));
-                StringAssert.Contains("must not be", exception.Message);
+                anchorObject.SetActive(true);
+                var oldPosition = anchorObject.transform.position;
+                physicsRoot.transform.SetPositionAndRotation(
+                    new Vector3(10f, 5f, -2f),
+                    Quaternion.Euler(0f, 90f, 0f));
+                var targetPosition = physicsRoot.transform.TransformPoint(authoredOffset);
+
+                anchor.UpdatePresentation(0.1f);
+
+                Assert.That(Vector3.Distance(anchorObject.transform.position, oldPosition), Is.GreaterThan(0f));
+                Assert.That(Vector3.Distance(anchorObject.transform.position, targetPosition), Is.GreaterThan(0f));
+
+                anchor.UpdatePresentation(100f);
+
+                Assert.That(Vector3.Distance(anchorObject.transform.position, targetPosition), Is.LessThan(0.0001f));
+                Assert.That(
+                    Quaternion.Angle(
+                        anchorObject.transform.rotation,
+                        physicsRoot.transform.rotation * authoredRotationOffset),
+                    Is.LessThan(0.0001f));
             }
             finally
             {
-                Object.DestroyImmediate(anchorObject);
-                Object.DestroyImmediate(physicsRoot);
+                Object.Destroy(anchorObject);
+                Object.Destroy(physicsRoot);
             }
+
+            yield return null;
         }
 
         [UnityTest]
@@ -140,6 +165,33 @@ namespace Modules.Character.UnityRuntime.Tests
             yield return null;
         }
 
+        [UnityTest]
+        public IEnumerator FixedUpdate_CommandedRotationProgressesWithoutFreezeConstraints()
+        {
+            var gameObject = new GameObject("offline-character-rotation-test");
+            try
+            {
+                var rigidbody = gameObject.AddComponent<Rigidbody>();
+                var controller = gameObject.AddComponent<OfflineCharacterController>();
+                controller.Construct(
+                    new TargetRotationSimulation(Quaternion.Euler(0f, 90f, 0f)),
+                    new ConstantInputSource(CharacterInput.None),
+                    new ConstantGroundProbe(),
+                    CharacterMovementSettings.Default);
+
+                yield return new WaitForFixedUpdate();
+                yield return new WaitForFixedUpdate();
+
+                Assert.That(Quaternion.Angle(Quaternion.identity, rigidbody.rotation), Is.GreaterThan(1f));
+            }
+            finally
+            {
+                Object.Destroy(gameObject);
+            }
+
+            yield return null;
+        }
+
         private sealed class ConstantViewYawProvider : ICharacterViewYawProvider
         {
             public ConstantViewYawProvider(float yaw)
@@ -192,6 +244,34 @@ namespace Modules.Character.UnityRuntime.Tests
                     body.LinearVelocity,
                     Vector3.zero,
                     body.Rotation,
+                    new CharacterSimulationState(
+                        new GravityState(SurfaceId.None, body.Rotation * Vector3.up),
+                        JumpPhase.None,
+                        0f,
+                        input.ViewYaw,
+                        body.Rotation * Vector3.forward));
+            }
+        }
+
+        private sealed class TargetRotationSimulation : ICharacterSimulationService
+        {
+            private readonly Quaternion _targetRotation;
+
+            public TargetRotationSimulation(Quaternion targetRotation)
+            {
+                _targetRotation = targetRotation;
+            }
+
+            public CharacterStepResult Simulate(
+                in CharacterInput input,
+                in CharacterBodySnapshot body,
+                in CharacterSimulationState state,
+                float tickDelta)
+            {
+                return new CharacterStepResult(
+                    body.LinearVelocity,
+                    Vector3.zero,
+                    _targetRotation,
                     new CharacterSimulationState(
                         new GravityState(SurfaceId.None, body.Rotation * Vector3.up),
                         JumpPhase.None,

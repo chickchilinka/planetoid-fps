@@ -3,6 +3,7 @@ using UnityEngine;
 
 namespace Modules.Character.UnityRuntime
 {
+    [DefaultExecutionOrder(-100)]
     public sealed class CharacterPresentationAnchor : MonoBehaviour
     {
         [SerializeField] private Transform _physicsRoot;
@@ -21,10 +22,15 @@ namespace Modules.Character.UnityRuntime
 
         private void LateUpdate()
         {
+            UpdatePresentation(Time.deltaTime);
+        }
+
+        internal void UpdatePresentation(float deltaTime)
+        {
             var targetPosition = _physicsRoot.TransformPoint(_positionOffset);
             var targetRotation = _physicsRoot.rotation * _rotationOffset;
-            var positionAlpha = 1f - Mathf.Exp(-_positionSharpness * Time.deltaTime);
-            var rotationAlpha = 1f - Mathf.Exp(-_rotationSharpness * Time.deltaTime);
+            var positionAlpha = 1f - Mathf.Exp(-_positionSharpness * deltaTime);
+            var rotationAlpha = 1f - Mathf.Exp(-_rotationSharpness * deltaTime);
             _presentationPosition = Vector3.Lerp(
                 _presentationPosition,
                 targetPosition,
@@ -50,11 +56,10 @@ namespace Modules.Character.UnityRuntime
         {
             if (physicsRoot == null)
                 throw new InvalidOperationException("A physics root is required for presentation smoothing.");
-            if (transform == physicsRoot || transform.IsChildOf(physicsRoot))
+            if (transform == physicsRoot)
             {
                 throw new InvalidOperationException(
-                    "The presentation anchor must not be the physics root or its descendant. " +
-                    "Use an independent transform so physics corrections can be smoothed.");
+                    "The presentation anchor must not be the physics root itself.");
             }
 
             _physicsRoot = physicsRoot;
