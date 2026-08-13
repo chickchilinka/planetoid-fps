@@ -68,6 +68,16 @@ PrefabInstance:
       propertyPath: m_Name
       value: BoxPlanet
       objectReference: {fileID: 0}
+    - target: {fileID: 3371277424412744496, guid: f504be4625f68644d991c81811afc49e,
+        type: 3}
+      propertyPath: _surfaceId
+      value: planet-box
+      objectReference: {fileID: 0}
+    - target: {fileID: 3371277424412744496, guid: f504be4625f68644d991c81811afc49e,
+        type: 3}
+      propertyPath: _gravityCollider
+      value:
+      objectReference: {fileID: 9089052147498595179}
     - target: {fileID: 6684772298012495510, guid: f504be4625f68644d991c81811afc49e,
         type: 3}
       propertyPath: m_Mesh
@@ -87,10 +97,6 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 9089052147498595179}
-    - targetCorrespondingSourceObject: {fileID: 4002681178229247106, guid: f504be4625f68644d991c81811afc49e,
-        type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 3719927371394530222}
   m_SourcePrefab: {fileID: 100100000, guid: f504be4625f68644d991c81811afc49e, type: 3}
 --- !u!1 &4021934957483668035 stripped
 GameObject:
@@ -119,17 +125,3 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &3719927371394530222
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4021934957483668035}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f87f40075fae4244bdb6c92fba3f7459, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
-  _surfaceId: planet-box
-  _gravityCollider: {fileID: 9089052147498595179}
