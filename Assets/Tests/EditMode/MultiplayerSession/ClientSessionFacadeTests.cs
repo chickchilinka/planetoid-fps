@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Modules.Multiplayer.Primitives;
 using NUnit.Framework;
+using Zenject;
 
 namespace Modules.Multiplayer.Session.Tests
 {
@@ -79,6 +80,31 @@ namespace Modules.Multiplayer.Session.Tests
         public void Constructor_NullPublisherIsRejected()
         {
             Assert.Throws<ArgumentNullException>(() => new ClientSessionFacade(null));
+        }
+
+        [Test]
+        public async Task InstallClient_BindsSingletonFacadeUsingPreboundPublisher()
+        {
+            var publisher = new FakeClientSessionCommandPublisher(
+                Result<Unit, SessionError>.Success(Unit.Value));
+            var container = new DiContainer();
+            container.Bind<IClientSessionCommandPublisher>().FromInstance(publisher);
+
+            SessionInstaller.InstallClient(container);
+
+            var first = container.Resolve<IClientSessionFacade>();
+            var second = container.Resolve<IClientSessionFacade>();
+            await first.SetReadyAsync(true, default);
+            Assert.That(second, Is.SameAs(first));
+            Assert.That(first, Is.TypeOf<ClientSessionFacade>());
+            Assert.That(publisher.Calls, Has.Count.EqualTo(1));
+            Assert.That(publisher.Calls[0].Ready, Is.True);
+        }
+
+        [Test]
+        public void InstallClient_NullContainerIsRejected()
+        {
+            Assert.Throws<ArgumentNullException>(() => SessionInstaller.InstallClient(null));
         }
 
         private static readonly SessionId SessionA =

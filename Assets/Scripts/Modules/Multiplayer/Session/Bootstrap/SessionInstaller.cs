@@ -5,6 +5,13 @@ namespace Modules.Multiplayer.Session
 {
     public static class SessionInstaller
     {
+        public static void InstallClient(DiContainer container)
+        {
+            if (container == null) throw new ArgumentNullException(nameof(container));
+
+            container.Bind<IClientSessionFacade>().To<ClientSessionFacade>().AsSingle();
+        }
+
         public static void InstallServer(DiContainer container, SessionConfiguration configuration)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));

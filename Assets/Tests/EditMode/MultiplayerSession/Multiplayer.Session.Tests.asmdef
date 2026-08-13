@@ -3,7 +3,8 @@
     "rootNamespace": "Modules.Multiplayer.Session.Tests",
     "references": [
         "Multiplayer.Session",
-        "Multiplayer.Primitives"
+        "Multiplayer.Primitives",
+        "Zenject"
     ],
     "includePlatforms": [
         "Editor"
