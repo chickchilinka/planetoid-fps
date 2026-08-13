@@ -247,8 +247,8 @@ MonoBehaviour:
   _assetPackSettingsRegistryReference:
     m_AssetGUID: deda4a28fe13ff0489ada23331bfd94b
     m_SubObjectName: 
+    m_SubObjectGUID: 
     m_SubObjectType: 
-    m_SubObjectGUID:
     m_EditorAssetChanged: 0
 --- !u!1001 &7240943578250125518
 PrefabInstance:
