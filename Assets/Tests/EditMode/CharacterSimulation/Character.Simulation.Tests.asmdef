@@ -1,0 +1,22 @@
+{
+    "name": "Character.Simulation.Tests",
+    "rootNamespace": "Modules.Character.Simulation.Tests",
+    "references": [
+        "Character.Simulation",
+        "SurfaceGravity.Core"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false,
+    "optionalUnityReferences": [
+        "TestAssemblies"
+    ]
+}
