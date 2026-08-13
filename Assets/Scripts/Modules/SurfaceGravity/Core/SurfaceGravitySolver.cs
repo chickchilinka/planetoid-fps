@@ -39,7 +39,9 @@ namespace Modules.SurfaceGravity.Core
             }
 
             var targetUp = selected.OutwardNormal.normalized;
-            var from = input.PreviousState.SmoothedUp.sqrMagnitude > 0.5f
+            var hasReplayableUp = input.PreviousState.ActiveSurface.IsValid &&
+                                  input.PreviousState.SmoothedUp.sqrMagnitude > 0.5f;
+            var from = hasReplayableUp
                 ? input.PreviousState.SmoothedUp.normalized
                 : input.BodyUp.normalized;
             var blend = 1f - Mathf.Exp(-_settings.NormalSharpness * input.TickDelta);

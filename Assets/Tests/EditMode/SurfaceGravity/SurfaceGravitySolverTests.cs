@@ -93,6 +93,39 @@ namespace Modules.SurfaceGravity.Tests
         }
 
         [Test]
+        public void Solve_FirstStepWithEmptyState_StartsSmoothingFromBodyUp()
+        {
+            var bodyUp = Vector3.down;
+            var settings = new SurfaceGravitySettings(9.81f, 6f, 0.25f);
+            var solver = new SurfaceGravitySolver(
+                new FakeGravitySurfaceProvider(Sample("planet-a", Vector3.right, 1f)),
+                settings);
+
+            var result = solver.Solve(new GravityStepInput(
+                Vector3.zero,
+                bodyUp,
+                GravityState.Empty,
+                0.02f));
+            var blend = 1f - Mathf.Exp(-settings.NormalSharpness * 0.02f);
+            var expected = Vector3.Slerp(bodyUp, Vector3.right, blend).normalized;
+            var incorrectWorldUpResult = Vector3.Slerp(Vector3.up, Vector3.right, blend).normalized;
+
+            Assert.That(result.TargetUp, Is.EqualTo(expected).Using(VectorComparer));
+            Assert.That(result.TargetUp, Is.Not.EqualTo(incorrectWorldUpResult).Using(VectorComparer));
+        }
+
+        [Test]
+        public void Solve_ProviderReturnsDefaultSample_ThrowsConfigurationError()
+        {
+            var solver = new SurfaceGravitySolver(
+                new FakeGravitySurfaceProvider(default(GravitySurfaceSample)),
+                SurfaceGravitySettings.Default);
+
+            Assert.Throws<InvalidOperationException>(() =>
+                solver.Solve(Input(Vector3.zero, GravityState.Empty)));
+        }
+
+        [Test]
         public void Solve_NoSamples_ReturnsNoAccelerationAndPreservesState()
         {
             var previous = new GravityState(new SurfaceId("planet-a"), Vector3.right);
