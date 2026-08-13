@@ -152,11 +152,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 4002681178229247106}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4546655f683a4a43a116870d127e0ce2, type: 3}
+  m_Script: {fileID: 11500000, guid: f87f40075fae4244bdb6c92fba3f7459, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _gravityCollider: {fileID: 6684772298012495510}
-  <GravityPoints>k__BackingField: []
+  _surfaceId: planet-sphere
+  _gravityCollider: {fileID: 2298094127246044971}
 --- !u!135 &2298094127246044971
 SphereCollider:
   m_ObjectHideFlags: 0

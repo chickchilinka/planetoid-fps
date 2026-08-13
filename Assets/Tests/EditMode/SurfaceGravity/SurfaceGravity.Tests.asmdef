@@ -2,7 +2,8 @@
     "name": "SurfaceGravity.Tests",
     "rootNamespace": "Modules.SurfaceGravity.Tests",
     "references": [
-        "SurfaceGravity.Core"
+        "SurfaceGravity.Core",
+        "SurfaceGravity.UnityRuntime"
     ],
     "includePlatforms": [
         "Editor"

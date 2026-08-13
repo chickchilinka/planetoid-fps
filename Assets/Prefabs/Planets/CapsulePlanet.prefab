@@ -87,6 +87,10 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 513049783125536788}
+    - targetCorrespondingSourceObject: {fileID: 4002681178229247106, guid: f504be4625f68644d991c81811afc49e,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1289564199696469580}
   m_SourcePrefab: {fileID: 100100000, guid: f504be4625f68644d991c81811afc49e, type: 3}
 --- !u!1 &4021934957483668035 stripped
 GameObject:
@@ -117,3 +121,17 @@ CapsuleCollider:
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &1289564199696469580
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4021934957483668035}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f87f40075fae4244bdb6c92fba3f7459, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  _surfaceId: planet-capsule
+  _gravityCollider: {fileID: 513049783125536788}
