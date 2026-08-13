@@ -16,16 +16,19 @@ namespace Modules.Multiplayer.Session.Networking
             container.RegisterGlobalMessageType<JoinAcceptedMessage>(SessionMessageTypeIds.JoinAccepted);
             container.RegisterGlobalMessageType<SessionSnapshotMessage>(SessionMessageTypeIds.Snapshot);
             container.RegisterGlobalMessageType<SessionCommandRejectedMessage>(SessionMessageTypeIds.CommandRejected);
+            container.RegisterGlobalMessageType<RejectionAcknowledgedMessage>(SessionMessageTypeIds.RejectionAcknowledged);
         }
 
         protected override void InstallServer(DiContainer container)
         {
             container.Bind<SessionConnectionRegistry>().AsSingle();
+            container.Bind<IRejectionCloseDelay>().To<RejectionCloseDelay>().AsSingle();
             container.BindInterfacesAndSelfTo<ServerSessionNetworkBridge>().AsSingle();
             container.Bind<ISessionEventPublisher>().To<ServerSessionSnapshotPublisher>().AsSingle();
             container.BindInterfacesAndSelfTo<ServerSessionConnectionProvider>().AsSingle();
             container.Bind<ISessionTelemetry>().To<SessionStructuredLogger>().AsSingle();
             container.RegisterGlobalConnectionMessageHandler<SetReadyMessageHandler, SetReadyMessage>();
+            container.RegisterGlobalConnectionMessageHandler<RejectionAcknowledgedMessageHandler, RejectionAcknowledgedMessage>();
         }
 
         protected override void InstallClient(DiContainer container)

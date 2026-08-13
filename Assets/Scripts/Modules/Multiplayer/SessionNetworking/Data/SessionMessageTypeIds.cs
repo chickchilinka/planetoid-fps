@@ -6,5 +6,6 @@ namespace Modules.Multiplayer.Session.Networking
         public const ushort JoinAccepted = 1001;
         public const ushort Snapshot = 1002;
         public const ushort CommandRejected = 1003;
+        public const ushort RejectionAcknowledged = 1004;
     }
 }

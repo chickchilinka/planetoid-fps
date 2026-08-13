@@ -17,13 +17,15 @@ namespace Modules.Multiplayer.Session.Networking.Tests
             Assert.That(SessionMessageTypeIds.JoinAccepted, Is.EqualTo(1001));
             Assert.That(SessionMessageTypeIds.Snapshot, Is.EqualTo(1002));
             Assert.That(SessionMessageTypeIds.CommandRejected, Is.EqualTo(1003));
+            Assert.That(SessionMessageTypeIds.RejectionAcknowledged, Is.EqualTo(1004));
             Assert.That(new[]
             {
                 SessionMessageTypeIds.SetReady,
                 SessionMessageTypeIds.JoinAccepted,
                 SessionMessageTypeIds.Snapshot,
-                SessionMessageTypeIds.CommandRejected
-            }.Distinct().Count(), Is.EqualTo(4));
+                SessionMessageTypeIds.CommandRejected,
+                SessionMessageTypeIds.RejectionAcknowledged
+            }.Distinct().Count(), Is.EqualTo(5));
         }
 
         [Test]
@@ -40,6 +42,7 @@ namespace Modules.Multiplayer.Session.Networking.Tests
         [TestCase(typeof(SessionSnapshotMessage), 7)]
         [TestCase(typeof(SessionPlayerSnapshotMessage), 5)]
         [TestCase(typeof(SessionCommandRejectedMessage), 1)]
+        [TestCase(typeof(RejectionAcknowledgedMessage), 0)]
         public void WireDtos_UseContiguousNumericMessagePackKeys(Type dtoType, int propertyCount)
         {
             Assert.That(dtoType.GetCustomAttributes(typeof(MessagePackObjectAttribute), false), Has.Length.EqualTo(1));
@@ -57,6 +60,7 @@ namespace Modules.Multiplayer.Session.Networking.Tests
         [TestCase(typeof(JoinAcceptedMessage))]
         [TestCase(typeof(SessionSnapshotMessage))]
         [TestCase(typeof(SessionCommandRejectedMessage))]
+        [TestCase(typeof(RejectionAcknowledgedMessage))]
         public void TopLevelMessages_ImplementPayloadMarker(Type dtoType)
         {
             Assert.That(typeof(IMessagePayload).IsAssignableFrom(dtoType), Is.True);

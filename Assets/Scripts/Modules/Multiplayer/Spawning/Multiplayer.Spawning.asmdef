@@ -1,0 +1,16 @@
+{
+    "name": "Multiplayer.Spawning",
+    "rootNamespace": "Modules.Multiplayer.Spawning",
+    "references": [
+        "Multiplayer.Primitives"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": true
+}

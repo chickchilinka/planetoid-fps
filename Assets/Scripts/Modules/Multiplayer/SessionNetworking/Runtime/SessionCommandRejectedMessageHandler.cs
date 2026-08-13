@@ -16,8 +16,7 @@ namespace Modules.Multiplayer.Session.Networking
 
         public UniTask HandleAsync(in SessionCommandRejectedMessage message, in MessageContext context)
         {
-            _bridge.ApplyRejection(message);
-            return UniTask.CompletedTask;
+            return _bridge.ApplyRejectionAsync(message);
         }
     }
 }

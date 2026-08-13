@@ -39,11 +39,12 @@ namespace Modules.Multiplayer.Session.Networking
             LastRejection = null;
         }
 
-        public void ApplyRejection(SessionCommandRejectedMessage message)
+        public async UniTask ApplyRejectionAsync(SessionCommandRejectedMessage message)
         {
             var error = SessionDtoMapper.ToDomain(message);
             LastRejection = error;
             CommandRejected?.Invoke(error);
+            await _messenger.Send(new RejectionAcknowledgedMessage());
         }
     }
 }

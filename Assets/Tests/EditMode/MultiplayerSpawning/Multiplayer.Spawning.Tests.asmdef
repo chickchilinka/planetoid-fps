@@ -1,0 +1,22 @@
+{
+    "name": "Multiplayer.Spawning.Tests",
+    "rootNamespace": "Modules.Multiplayer.Spawning.Tests",
+    "references": [
+        "Multiplayer.Spawning",
+        "Multiplayer.Primitives"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false,
+    "optionalUnityReferences": [
+        "TestAssemblies"
+    ]
+}

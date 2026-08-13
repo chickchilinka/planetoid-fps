@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using Base.Network.Data;
 using Base.Network.Model;
@@ -18,17 +19,20 @@ namespace Modules.Multiplayer.Session.Networking
         private readonly IServerSessionFacade _session;
         private readonly ServerMessenger _messenger;
         private readonly SessionConnectionRegistry _registry;
+        private readonly IRejectionCloseDelay _rejectionCloseDelay;
         private readonly CancellationTokenSource _lifetime = new();
+        private readonly Dictionary<int, PendingRejection> _pendingRejections = new();
         private IDisposable _connectedSubscription;
         private IDisposable _disconnectedSubscription;
 
         public ServerSessionNetworkBridge(INetworkServer server, IServerSessionFacade session, ServerMessenger messenger,
-            SessionConnectionRegistry registry)
+            SessionConnectionRegistry registry, IRejectionCloseDelay rejectionCloseDelay)
         {
             _server = server ?? throw new ArgumentNullException(nameof(server));
             _session = session ?? throw new ArgumentNullException(nameof(session));
             _messenger = messenger ?? throw new ArgumentNullException(nameof(messenger));
             _registry = registry ?? throw new ArgumentNullException(nameof(registry));
+            _rejectionCloseDelay = rejectionCloseDelay ?? throw new ArgumentNullException(nameof(rejectionCloseDelay));
         }
 
         public void Initialize()
@@ -77,9 +81,20 @@ namespace Modules.Multiplayer.Session.Networking
 
         public async UniTask HandleDisconnectedAsync(ConnectionId connectionId, DisconnectReason reason)
         {
+            if (_pendingRejections.Remove(connectionId.Value, out var pending))
+                pending.Cancel();
             // Unregister first so a reentrant snapshot publication never observes a disconnected recipient.
             if (_registry.Unregister(connectionId, out var playerId) && playerId.IsValid)
                 await _session.LeaveAsync(playerId, _lifetime.Token);
+        }
+
+        public UniTask HandleRejectionAcknowledgedAsync(ConnectionId from, MessageContext context)
+        {
+            if (context.Source.Value != from.Value || !_pendingRejections.Remove(from.Value, out var pending))
+                return UniTask.CompletedTask;
+
+            pending.Cancel();
+            return pending.Connection.DisconnectAsync(DisconnectReason.ClosedByServer);
         }
 
         public void Dispose()
@@ -87,14 +102,47 @@ namespace Modules.Multiplayer.Session.Networking
             _connectedSubscription?.Dispose();
             _disconnectedSubscription?.Dispose();
             _lifetime.Cancel();
+            foreach (var pending in _pendingRejections.Values) pending.Cancel();
+            _pendingRejections.Clear();
             _lifetime.Dispose();
         }
 
         private async UniTask RejectAndDisconnectAsync(IConnection connection, SessionError error)
         {
-            // Send reliably before closing; the transport may still drop it, but order is explicit.
+            // Base.Network has no transport flush or delivery acknowledgement. Keep the connection alive
+            // until the client confirms receipt, while a short bounded timeout guarantees cleanup.
             await _messenger.To(connection.Id, SessionDtoMapper.ToDto(error));
-            await connection.DisconnectAsync(DisconnectReason.ClosedByServer);
+            var pending = new PendingRejection(connection);
+            _pendingRejections.Add(connection.Id.Value, pending);
+            CloseAfterRejectionGraceAsync(connection.Id, pending).Forget();
+        }
+
+        private async UniTask CloseAfterRejectionGraceAsync(ConnectionId connectionId, PendingRejection pending)
+        {
+            try
+            {
+                await _rejectionCloseDelay.WaitAsync(pending.Token);
+                if (_pendingRejections.Remove(connectionId.Value, out var current) && ReferenceEquals(current, pending))
+                    await pending.Connection.DisconnectAsync(DisconnectReason.ClosedByServer);
+            }
+            catch (OperationCanceledException)
+            {
+            }
+            finally
+            {
+                pending.Dispose();
+            }
+        }
+
+        private sealed class PendingRejection : IDisposable
+        {
+            private readonly CancellationTokenSource _cancellation = new();
+
+            public PendingRejection(IConnection connection) => Connection = connection;
+            public IConnection Connection { get; }
+            public CancellationToken Token => _cancellation.Token;
+            public void Cancel() => _cancellation.Cancel();
+            public void Dispose() => _cancellation.Dispose();
         }
     }
 }
