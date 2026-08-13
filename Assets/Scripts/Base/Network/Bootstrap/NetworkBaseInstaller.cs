@@ -14,6 +14,9 @@ namespace Base.Network.Bootstrap
         {
             container.BindInterfacesAndSelfTo<RegisterGlobalHandlersRule>().AsSingle();
             container.BindInterfacesAndSelfTo<RegisterGlobalMessageTypesRule>().AsSingle();
+            // Handlers may be registered by feature installers. Ensure wire IDs exist before routers receive traffic.
+            container.BindExecutionOrder<RegisterGlobalMessageTypesRule>(-100);
+            container.BindExecutionOrder<RegisterGlobalHandlersRule>(-50);
             container.BindInterfacesAndSelfTo<NetworkService>().AsSingle().WithArguments(isServer);
             container.BindInterfacesAndSelfTo<MessageTypeRegistry>().AsSingle();
             container.BindInterfacesAndSelfTo<EnvelopeFactory>().AsSingle();
