@@ -296,6 +296,68 @@ namespace Modules.Multiplayer.Session.Tests
         }
 
         [Test]
+        public async Task JipSpawnFailure_RetriesOnceThenDisconnectsAndRemovesOnlyJip()
+        {
+            var fixture = SessionFixture.Create();
+            var load = await AdvanceToPlayingAsync(fixture);
+            fixture.Spawn.SpawnResults.Enqueue(
+                Result<SpawnPlayerResult, SessionError>.Failure(SessionError.SpawnFailed));
+            fixture.Spawn.SpawnResults.Enqueue(
+                Result<SpawnPlayerResult, SessionError>.Failure(SessionError.SpawnFailed));
+            var jip = (await fixture.JoinAsync()).Value;
+
+            var result = await fixture.Service.NotifyPlayerWorldReadyAsync(
+                load.OperationId, jip, load.MatchId, default);
+
+            Assert.That(result.Error, Is.EqualTo(SessionError.SpawnFailed));
+            Assert.That(fixture.Spawn.SpawnRequests.Count(request => request.PlayerId == jip), Is.EqualTo(2));
+            Assert.That(fixture.Connections.Disconnects.Single(), Is.EqualTo(
+                (fixture.PlayerConnections[jip], SessionError.SpawnFailed)));
+            Assert.That(fixture.Service.Snapshot.Phase, Is.EqualTo(SessionPhase.Playing));
+            Assert.That(fixture.Service.Snapshot.Players.Any(player => player.PlayerId == jip), Is.False);
+        }
+
+        [Test]
+        public async Task InitialSpawnFailure_RetriesThenRecoversInsteadOfStallingLoading()
+        {
+            var fixture = SessionFixture.Create();
+            var (first, _, load) = await StartLoadingAsync(fixture);
+            fixture.Spawn.SpawnResults.Enqueue(
+                Result<SpawnPlayerResult, SessionError>.Failure(SessionError.SpawnFailed));
+            fixture.Spawn.SpawnResults.Enqueue(
+                Result<SpawnPlayerResult, SessionError>.Failure(SessionError.SpawnFailed));
+            await fixture.Service.NotifyPlayerWorldReadyAsync(load.OperationId, first, load.MatchId, default);
+
+            var result = await fixture.Service.NotifyServerWorldReadyAsync(load.OperationId, load.MatchId, default);
+
+            Assert.That(result.Error, Is.EqualTo(SessionError.SpawnFailed));
+            Assert.That(fixture.Spawn.SpawnRequests.Count(request => request.PlayerId == first), Is.EqualTo(2));
+            Assert.That(fixture.Connections.Disconnects.Single().Reason, Is.EqualTo(SessionError.SpawnFailed));
+            Assert.That(fixture.Service.Snapshot.Phase, Is.EqualTo(SessionPhase.WaitingForPlayers));
+            Assert.That(fixture.Service.Snapshot.Players.All(player => !player.Ready), Is.True);
+            Assert.That(fixture.World.CancelledOperations, Is.EqualTo(new[] { load.OperationId }));
+        }
+
+        [Test]
+        public async Task TimedOutJip_RejectsReadinessWhileDisconnectIsInProgress()
+        {
+            var fixture = SessionFixture.Create(playerLoadTimeout: TimeSpan.FromMilliseconds(40));
+            var load = await AdvanceToPlayingAsync(fixture);
+            fixture.Connections.BlockDisconnect = true;
+            var jip = (await fixture.JoinAsync()).Value;
+
+            Assert.That(await WaitForTaskAsync(fixture.Connections.DisconnectStarted.Task), Is.True);
+            var ready = await fixture.Service.NotifyPlayerWorldReadyAsync(
+                load.OperationId, jip, load.MatchId, default);
+
+            Assert.That(ready.IsFailure, Is.True);
+            Assert.That(ready.Error, Is.EqualTo(SessionError.ConnectionClosed));
+            Assert.That(fixture.Service.Snapshot.Player(jip).WorldReady, Is.False);
+            Assert.That(fixture.Spawn.SpawnRequests.Any(request => request.PlayerId == jip), Is.False);
+            fixture.Connections.DisconnectCompletion.TrySetResult(Unit.Value);
+        }
+
+        [Test]
         public async Task SpawnCompletionFromCancelledOperation_CannotMutateReplacementState()
         {
             var fixture = SessionFixture.Create();
@@ -379,6 +441,12 @@ namespace Modules.Multiplayer.Session.Tests
             }
 
             return condition();
+        }
+
+        private static async Task<bool> WaitForTaskAsync(Task task)
+        {
+            var winner = await Task.WhenAny(task, Task.Delay(TimeSpan.FromSeconds(2)));
+            return ReferenceEquals(winner, task);
         }
     }
 }

@@ -23,6 +23,7 @@ namespace Modules.Multiplayer.Session
         private readonly HashSet<PlayerId> _initialParticipants = new HashSet<PlayerId>();
         private readonly Dictionary<PlayerId, PlayerTimeoutContext> _playerTimeouts =
             new Dictionary<PlayerId, PlayerTimeoutContext>();
+        private readonly HashSet<PlayerId> _terminalDisconnectingPlayers = new HashSet<PlayerId>();
         private readonly Dictionary<PlayerId, CancellationTokenSource> _playerWork =
             new Dictionary<PlayerId, CancellationTokenSource>();
         private readonly object _publicationSync = new object();
@@ -147,6 +148,7 @@ namespace Modules.Multiplayer.Session
                 _players.Remove(playerId);
                 _playersByConnection.Remove(player.Connection);
                 _initialParticipants.Remove(playerId);
+                _terminalDisconnectingPlayers.Remove(playerId);
                 if (_playerTimeouts.TryGetValue(playerId, out timeout)) _playerTimeouts.Remove(playerId);
                 if (_playerWork.TryGetValue(playerId, out playerWork)) _playerWork.Remove(playerId);
 
@@ -325,6 +327,12 @@ namespace Modules.Multiplayer.Session
                     return Completed();
                 }
 
+                if (_terminalDisconnectingPlayers.Contains(playerId))
+                {
+                    result = Result<Unit, SessionError>.Failure(SessionError.ConnectionClosed);
+                    return Completed();
+                }
+
                 if (!player.WorldReady)
                 {
                     player.WorldReady = true;
@@ -439,6 +447,8 @@ namespace Modules.Multiplayer.Session
             if (completed) return Result<Unit, SessionError>.Success(Unit.Value);
             if (!timedOut) return Result<Unit, SessionError>.Failure(SessionError.InvalidPhase);
             await RecoverInitialLoadAsync(request, SessionError.WorldLoadTimeout).ConfigureAwait(false);
+            if (await IsLoadCompletedAsync(context).ConfigureAwait(false))
+                return Result<Unit, SessionError>.Success(Unit.Value);
             Record(SessionTelemetryKind.WorldLoad, PlayerId.None, SessionError.WorldLoadTimeout);
             return Result<Unit, SessionError>.Failure(SessionError.WorldLoadTimeout);
         }
@@ -516,15 +526,25 @@ namespace Modules.Multiplayer.Session
             if (!prepared) return Result<Unit, SessionError>.Success(Unit.Value);
             await PublishPendingAsync(publication).ConfigureAwait(false);
 
-            Result<SpawnPlayerResult, SessionError> spawnResult;
-            try
+            Result<SpawnPlayerResult, SessionError> spawnResult = default;
+            for (var attempt = 0; attempt < 2; attempt++)
             {
-                spawnResult = await _spawnProvider.SpawnAsync(request, work.Token).ConfigureAwait(false);
-            }
-            catch (OperationCanceledException) when (work.IsCancellationRequested)
-            {
-                work.Dispose();
-                return Result<Unit, SessionError>.Failure(SessionError.InvalidPhase);
+                try
+                {
+                    spawnResult = await _spawnProvider.SpawnAsync(request, work.Token).ConfigureAwait(false);
+                }
+                catch (OperationCanceledException) when (work.IsCancellationRequested)
+                {
+                    work.Dispose();
+                    return Result<Unit, SessionError>.Failure(SessionError.InvalidPhase);
+                }
+
+                if (spawnResult.IsSuccess || attempt == 1) break;
+                if (!await IsSpawnStillActiveAsync(request, work).ConfigureAwait(false))
+                {
+                    work.Dispose();
+                    return Result<Unit, SessionError>.Failure(SessionError.InvalidPhase);
+                }
             }
 
             Task appliedPublication = null;
@@ -560,13 +580,34 @@ namespace Modules.Multiplayer.Session
             CancelAndDispose(completedLoad);
             if (staleSuccess)
                 await _spawnProvider.DespawnAsync(playerId, CancellationToken.None).ConfigureAwait(false);
+            if (!applied) return Result<Unit, SessionError>.Failure(SessionError.InvalidPhase);
             if (applied) await PublishPendingAsync(appliedPublication).ConfigureAwait(false);
             if (enteredPlaying) Record(SessionTelemetryKind.PhaseChanged, PlayerId.None, null);
             Record(SessionTelemetryKind.Spawn, playerId,
                 spawnResult.IsFailure ? SessionError.SpawnFailed : (SessionError?)null);
-            return spawnResult.IsSuccess
-                ? Result<Unit, SessionError>.Success(Unit.Value)
-                : Result<Unit, SessionError>.Failure(SessionError.SpawnFailed);
+            if (spawnResult.IsSuccess) return Result<Unit, SessionError>.Success(Unit.Value);
+
+            await _connectionProvider.DisconnectAsync(
+                request.Connection, SessionError.SpawnFailed, CancellationToken.None).ConfigureAwait(false);
+            await LeaveAsync(playerId, CancellationToken.None).ConfigureAwait(false);
+            return Result<Unit, SessionError>.Failure(SessionError.SpawnFailed);
+        }
+
+        private async ValueTask<bool> IsSpawnStillActiveAsync(
+            SpawnPlayerRequest request,
+            CancellationTokenSource work)
+        {
+            var active = false;
+            await _queue.ExecuteAsync(() =>
+            {
+                active = MatchesActiveWorld(request.OperationId, request.MatchId) &&
+                         _players.TryGetValue(request.PlayerId, out var player) &&
+                         player.SpawnState == SpawnState.Spawning &&
+                         _playerWork.TryGetValue(request.PlayerId, out var current) &&
+                         ReferenceEquals(current, work);
+                return Completed();
+            }, CancellationToken.None).ConfigureAwait(false);
+            return active;
         }
 
         private async Task EnforcePlayerLoadTimeoutAsync(PlayerTimeoutContext context)
@@ -583,6 +624,7 @@ namespace Modules.Multiplayer.Session
                         MatchesActiveWorld(context.OperationId, context.MatchId) &&
                         _players.TryGetValue(context.PlayerId, out var player) && !player.WorldReady;
                     if (shouldDisconnect) _playerTimeouts.Remove(context.PlayerId);
+                    if (shouldDisconnect) _terminalDisconnectingPlayers.Add(context.PlayerId);
                     return Completed();
                 }, CancellationToken.None).ConfigureAwait(false);
 

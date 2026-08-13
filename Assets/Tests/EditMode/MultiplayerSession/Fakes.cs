@@ -148,6 +148,8 @@ namespace Modules.Multiplayer.Session.Tests
         public List<PlayerId> DespawnRequests { get; } = new List<PlayerId>();
         public Result<SpawnPlayerResult, SessionError> SpawnResult { get; set; } =
             Result<SpawnPlayerResult, SessionError>.Success(SpawnPlayerResult.Completed);
+        public Queue<Result<SpawnPlayerResult, SessionError>> SpawnResults { get; } =
+            new Queue<Result<SpawnPlayerResult, SessionError>>();
         public bool BlockSpawn { get; set; }
         public bool IgnoreCancellation { get; set; }
         public TaskCompletionSource<Result<SpawnPlayerResult, SessionError>> SpawnCompletion { get; } =
@@ -159,6 +161,7 @@ namespace Modules.Multiplayer.Session.Tests
             CancellationToken token)
         {
             SpawnRequests.Add(request);
+            if (SpawnResults.Count > 0) return SpawnResults.Dequeue();
             if (!BlockSpawn) return SpawnResult;
             if (IgnoreCancellation) return await SpawnCompletion.Task;
             return await WithCancellation(SpawnCompletion.Task, token);
@@ -198,14 +201,20 @@ namespace Modules.Multiplayer.Session.Tests
 
         public List<(SessionConnection Connection, SessionError Reason)> Disconnects { get; } =
             new List<(SessionConnection, SessionError)>();
+        public bool BlockDisconnect { get; set; }
+        public TaskCompletionSource<Unit> DisconnectStarted { get; } =
+            new TaskCompletionSource<Unit>(TaskCreationOptions.RunContinuationsAsynchronously);
+        public TaskCompletionSource<Unit> DisconnectCompletion { get; } =
+            new TaskCompletionSource<Unit>(TaskCreationOptions.RunContinuationsAsynchronously);
 
-        public ValueTask DisconnectAsync(
+        public async ValueTask DisconnectAsync(
             SessionConnection connection,
             SessionError reason,
             CancellationToken token)
         {
             lock (_sync) Disconnects.Add((connection, reason));
-            return default;
+            DisconnectStarted.TrySetResult(Unit.Value);
+            if (BlockDisconnect) await DisconnectCompletion.Task;
         }
     }
 }
